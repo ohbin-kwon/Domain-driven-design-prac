@@ -49,3 +49,31 @@ export class Batch {
     return this.sku === line.sku && this.availableQuantity >= line.quantity;
   }
 }
+
+function compareBatchesEta(batches){
+  batches.forEach(batch => {
+    if(batch.eta === null) return batch
+  })
+  function compare( a, b ) {
+    if ( a.eta < b.eta ){
+      return -1;
+    }
+    if ( a.eta > b.eta ){
+      return 1;
+    }
+    return 0;
+  }
+  batches.sort(compare)
+  return batches[0]
+}
+
+export function allocate(line, batches) {
+  // batch의 eta가 null인곳에 우선적으로 배치한다.
+  // batch의 eta가 작은곳부터 그다음 우선적으로 배치한다.
+  // 배열의 item인 object의 property 비교를 통해 allocate 함수가 실행되기 때문에 해당 함수를 구현해서 allocate에 작성해야겠다.
+  // 작성한 compareBatchesEta 함수를 이용한다.
+  const batch = compareBatchesEta(batches)
+  batch.allocate(line)
+  return batch.reference
+}
+
