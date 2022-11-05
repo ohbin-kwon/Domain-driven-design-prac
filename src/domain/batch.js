@@ -7,25 +7,45 @@
 // js에서 불변객체를 만들기위해서는 1. 컨벤션을 가지고 필요한 부분에 불변객체를 사용하거나 2. 인간을 믿지 못한다면 라이브러리를 활용해 강제해야한다.
 // 1번을 채택하고, OrderLIne으로 객체를 생성할때는 불변객체로 생성한다.
 export class OrderLine {
-  constructor(orderId, sku, quantity) { // orderId는 Order의 식별자이지, OrderLine의 식별자가 아니다.
-    this.orderId = orderId
-    this.sku = sku
-    this.quantity = quantity
+  constructor(orderId, sku, quantity) {
+    // orderId는 Order의 식별자이지, OrderLine의 식별자가 아니다.
+    this.orderId = orderId;
+    this.sku = sku;
+    this.quantity = quantity;
   }
 }
 
 export class Batch {
   constructor(reference, sku, quantity, eta) {
-    this.reference = reference
-    this.sku = sku
-    this.eta = eta
-    this.availableQuantity = quantity
+    this.reference = reference;
+    this.sku = sku;
+    this.eta = eta;
+    this._purchasedQuantity = quantity;
+    this._allocation = new Set();
   }
 
-  allocate (line) {
-    this.availableQuantity -= line.quantity
+  allocate(line) {
+    if (this.canAllocate) {
+      this._allocation.add(line);
+    }
   }
+  deallocate(line) {
+    if (this._allocation.has(line)) {
+      this._allocation.delete(line);
+    }
+  }
+
+  get allocatedQuantity() {
+    let sum = 0;
+    this._allocation.forEach((line) => (sum += line.quantity));
+    return sum;
+  }
+
+  get availableQuantity() {
+    return this._purchasedQuantity - this.allocatedQuantity;
+  }
+
   canAllocate(line) {
-    return (this.sku === line.sku) && (this.availableQuantity >= line.quantity)
+    return this.sku === line.sku && this.availableQuantity >= line.quantity;
   }
 }
