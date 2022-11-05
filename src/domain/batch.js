@@ -25,4 +25,7 @@ export class Batch {
   allocate (line) {
     this.availableQuantity -= line.quantity
   }
+  canAllocate(line) {
+    return (this.sku === line.sku) && (this.availableQuantity >= line.quantity)
+  }
 }
