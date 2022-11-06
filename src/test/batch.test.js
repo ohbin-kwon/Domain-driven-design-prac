@@ -100,3 +100,14 @@ describe('domain function(allocate line to batch) test', () => {
     expect(allocation).toBe(inStockBatch.reference)
   })
 });
+
+describe('out of stock exception', () => {
+  test('test raises out of stock exception if cannot allocate', () => {
+    const [batch, line] = makeBatchAndLine('LAMP', 10, 10);
+    allocate(line, [batch])
+    const secondLine = new OrderLine('order-123', 'LAMP', 1)
+    Object.freeze(secondLine)
+    expect(() => {allocate(secondLine, [batch])}).toThrow(new Error('out of stock'))
+  })
+
+})
