@@ -10,18 +10,18 @@ describe('allocate test', () => {
   // required보다 available이 많은 경우 할당할 수 있다.
   test('test can allocate if available greater than required', () => {
     const [largeBatch, smallLine] = makeBatchAndLine('LAMP', 20, 2);
-    expect(largeBatch.canAllocate(smallLine)).toBe(true);
+    expect(largeBatch.canAllocate(smallLine)).toBe('SUCCESS');
   });
   // required보다 available이 적은 경우 할당할 수 없다.
   test('test cannot allocate if available smaller than required', () => {
     const [smallBatch, largeLine] = makeBatchAndLine('LAMP', 2, 20);
-    expect(smallBatch.canAllocate(largeLine)).toBe(false);
+    expect(smallBatch.canAllocate(largeLine)).toBe('OUT-OF-STOCK');
   });
 
   // required와 available이 같다면 할당 할 수 있다.
   test('test can allocate if available equal to required', () => {
     const [batch, line] = makeBatchAndLine('LAMP', 2, 2);
-    expect(batch.canAllocate(line)).toBe(true);
+    expect(batch.canAllocate(line)).toBe('SUCCESS');
   });
 
   // batch와 line의 sku가 다르다면 할당 할 수 없다.
@@ -29,7 +29,7 @@ describe('allocate test', () => {
     const batch = new Batch('batch-001', 'LAMP', 100, Date.now());
     const differentSkuLine = new OrderLine('order-123', 'CHAIR', 10);
     Object.freeze(differentSkuLine);
-    expect(batch.canAllocate(differentSkuLine)).toBe(false);
+    expect(batch.canAllocate(differentSkuLine)).toBe('DIFFERENT-SKU');
   });
 
   test('test allocating to a batch reduces the available quantity', () => {
@@ -107,7 +107,7 @@ describe('out of stock exception', () => {
     allocate(line, [batch])
     const secondLine = new OrderLine('order-123', 'LAMP', 1)
     Object.freeze(secondLine)
-    expect(() => {allocate(secondLine, [batch])}).toThrow(new Error('out of stock'))
+    expect(allocate(secondLine, [batch])).toBe('OUT-OF-STOCK')
   })
 
 })
