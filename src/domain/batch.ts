@@ -16,14 +16,18 @@ interface Set<T> {
   readonly size: number;
 }
 
-function _catchInStockEta(batches: Array<Batch>) {
+interface ExistedEtaBatch extends Batch {
+  eta: Date;
+}
+
+function _catchInStockBatch(batches: Array<Batch>) {
   for (let batch of batches) {
-    if (batch.eta === new Date('0')) return batch;
+    if (batch.eta === undefined) return batch;
   }
   return null;
 }
 
-function _findBatchByEta(batches: Array<Batch>) {
+function _findEarliestEtaBatch(batches: Array<ExistedEtaBatch>) {
   batches.sort((a, b) => {
     if (a.eta < b.eta) {
       return -1;
@@ -36,10 +40,11 @@ function _findBatchByEta(batches: Array<Batch>) {
   return batches[0];
 }
 
-function _compareBatchesEta(batches: Array<Batch>) {
-  const batch = _catchInStockEta(batches);
+function _checkBatchesEta(batches: Array<Batch>) {
+  const batch = _catchInStockBatch(batches);
   if (batch === null) {
-    return _findBatchByEta(batches);
+    // issue #5 will explain about type assertion
+    return _findEarliestEtaBatch(batches as Array<ExistedEtaBatch>);
   }
   return batch;
 }
@@ -62,7 +67,7 @@ export class Batch {
     public reference: string,
     public sku: string,
     quantity: number,
-    public eta: Date,
+    public eta?: Date,
   ) {
     this.reference = reference;
     this.sku = sku;
@@ -107,7 +112,7 @@ export class Batch {
 }
 
 export function allocate(line: OrderLine, batches: Array<Batch>) {
-  const batch = _compareBatchesEta(batches);
+  const batch = _checkBatchesEta(batches);
   const allocateResult = batch.allocate(line);
   if (allocateResult !== AllocateResult['SUCCESS']) {
     return allocateResult;
