@@ -68,7 +68,7 @@ describe('deallocate test', () => {
 
 describe('domain function(allocate line to batch) test', () => {
   test('test prefers current stock batches to shipment', () => {
-    const inStockBatch = new Batch('in-stock-batch', 'CLOCK', 100, new Date('0'));
+    const inStockBatch = new Batch('in-stock-batch', 'CLOCK', 100);
     const shipmentBatch = new Batch('shipment-batch', 'CLOCK', 100, new Date('2022-08-25'));
     const line = new OrderLine('order-123', 'CLOCK', 10);
 
@@ -92,7 +92,7 @@ describe('domain function(allocate line to batch) test', () => {
   })
 
   test('test returns allocated batch ref', () => {
-    const inStockBatch = new Batch('in-stock-batch', 'CLOCK', 100, new Date('0'));
+    const inStockBatch = new Batch('in-stock-batch', 'CLOCK', 100);
     const shipmentBatch = new Batch('shipment-batch', 'CLOCK', 100, new Date('2022-08-25'));
     const line = new OrderLine('order-123', 'CLOCK', 10);
 
