@@ -22,6 +22,8 @@
     "typescript": "^4.8.4"
   },
   "dependencies": {
+    "@mikro-orm/core": "^5.5.2",
+    "@mikro-orm/postgresql": "^5.5.2",
     "express": "^4.18.2"
   }
 }
