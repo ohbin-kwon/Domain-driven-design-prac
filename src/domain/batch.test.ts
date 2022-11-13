@@ -1,4 +1,4 @@
-import { Batch, OrderLine, allocate } from '../domain/batch';
+import { Batch, OrderLine, allocate } from './batch';
 // batchQuantity, lineQuantity에 맞는 batch와 line을 만들어내는 함수
 function makeBatchAndLine(sku: string, batchQuantity: number, lineQuantity: number): [Batch, OrderLine] {
   return [
