@@ -4,10 +4,12 @@
   "description": "order system with tdd, ddd",
   "main": "index.js",
   "scripts": {
-    "test": "jest --setupFiles --forceExit --detectOpenHandles",
+    "test": "NODE_ENV=test jest --setupFiles --forceExit --detectOpenHandles",
     "start": "node dist/src/app.js",
     "build": "tsc -p .",
-    "dev": "nodemon --watch \"src/**/*.ts\" --exec \"ts-node\" src/app.ts"
+    "dev": "nodemon --watch \"src/**/*.ts\" --exec \"ts-node\" src/app.ts",
+    "postgres:up": "docker compose --env-file ./config/.env.test up -d postgres ",
+    "postgres:down": "docker compose --env-file ./config/.env.test down --remove-orphans"
   },
   "author": "ohbin kwon",
   "license": "ISC",
