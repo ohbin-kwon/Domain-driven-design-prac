@@ -51,7 +51,7 @@ function _checkBatchesEta(batches: Array<Batch>) {
 
 export class OrderLine {
   constructor(
-    public orderId: string,
+    public orderId: number,
     public sku: string,
     public quantity: number,
   ) {
@@ -76,8 +76,8 @@ export class Batch {
     this._allocation = new Set();
   }
 
-  private _purchasedQuantity: number;
-  private _allocation: Set<OrderLine>;
+  _purchasedQuantity: number;
+  _allocation: Set<OrderLine>;
 
   canAllocate(line: OrderLine) {
     if (this.sku !== line.sku) return AllocateResult['DIFFERENT-SKU'];
