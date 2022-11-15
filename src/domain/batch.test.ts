@@ -3,7 +3,7 @@ import { Batch, OrderLine, allocate } from './batch';
 function makeBatchAndLine(sku: string, batchQuantity: number, lineQuantity: number): [Batch, OrderLine] {
   return [
     new Batch('batch-001', sku, batchQuantity, new Date('2022-08-25')),
-    Object.freeze(new OrderLine('order-123', sku, lineQuantity)),
+    Object.freeze(new OrderLine(1, sku, lineQuantity)),
   ];
 }
 describe('allocate test', () => {
@@ -27,7 +27,7 @@ describe('allocate test', () => {
   // batch와 line의 sku가 다르다면 할당 할 수 없다.
   test('test cannot allocate if batch sku and line sku do not match', () => {
     const batch = new Batch('batch-001', 'LAMP', 100, new Date('2022-08-25'));
-    const differentSkuLine = new OrderLine('order-123', 'CHAIR', 10);
+    const differentSkuLine = new OrderLine(1, 'CHAIR', 10);
     Object.freeze(differentSkuLine);
     expect(batch.canAllocate(differentSkuLine)).toBe('sku is different');
   });
@@ -50,7 +50,7 @@ describe('deallocate test', () => {
 
   test('test can only deallocate allocated lines', () => {
     const [batch, line] = makeBatchAndLine('LAMP', 20, 2);
-    const unallocatedLine = new OrderLine('order-123', 'SMALL-TABLE', 3);
+    const unallocatedLine = new OrderLine(1, 'SMALL-TABLE', 3);
     Object.freeze(unallocatedLine);
 
     batch.allocate(line);
@@ -70,7 +70,7 @@ describe('domain function(allocate line to batch) test', () => {
   test('test prefers current stock batches to shipment', () => {
     const inStockBatch = new Batch('in-stock-batch', 'CLOCK', 100);
     const shipmentBatch = new Batch('shipment-batch', 'CLOCK', 100, new Date('2022-08-25'));
-    const line = new OrderLine('order-123', 'CLOCK', 10);
+    const line = new OrderLine(1, 'CLOCK', 10);
 
     allocate(line, [inStockBatch, shipmentBatch]);
 
@@ -82,7 +82,7 @@ describe('domain function(allocate line to batch) test', () => {
     const earliest = new Batch('earliest-batch', 'CLOCK', 100, new Date('2022-08-25'));
     const medium = new Batch('medium-batch', 'CLOCK', 100, new Date('2022-08-26'));
     const latest = new Batch('latest-batch', 'CLOCK', 100, new Date('2022-08-27'));
-    const line = new OrderLine('order-123', 'CLOCK', 10);
+    const line = new OrderLine(1, 'CLOCK', 10);
 
     allocate(line, [earliest, medium, latest])
 
@@ -91,13 +91,13 @@ describe('domain function(allocate line to batch) test', () => {
     expect(latest.availableQuantity).toBe(100)
   })
 
-  test('test returns allocated batch ref', () => {
+  test('test returns allocated batch id', () => {
     const inStockBatch = new Batch('in-stock-batch', 'CLOCK', 100);
     const shipmentBatch = new Batch('shipment-batch', 'CLOCK', 100, new Date('2022-08-25'));
-    const line = new OrderLine('order-123', 'CLOCK', 10);
+    const line = new OrderLine(1, 'CLOCK', 10);
 
     const allocation = allocate(line, [inStockBatch, shipmentBatch]);
-    expect(allocation).toBe(inStockBatch.reference)
+    expect(allocation).toBe(inStockBatch.id)
   })
 });
 
@@ -105,7 +105,7 @@ describe('out of stock exception', () => {
   test('test raises out of stock exception if cannot allocate', () => {
     const [batch, line] = makeBatchAndLine('LAMP', 10, 10);
     allocate(line, [batch])
-    const secondLine = new OrderLine('order-123', 'LAMP', 1)
+    const secondLine = new OrderLine(1, 'LAMP', 1)
     Object.freeze(secondLine)
     expect(allocate(secondLine, [batch])).toBe('out of stock')
   })

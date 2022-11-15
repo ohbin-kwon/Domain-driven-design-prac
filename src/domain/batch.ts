@@ -64,12 +64,12 @@ export class OrderLine {
 
 export class Batch {
   constructor(
-    public reference: string,
+    public id: string,
     public sku: string,
-    quantity: number,
+    public quantity: number,
     public eta?: Date,
   ) {
-    this.reference = reference;
+    this.id = id;
     this.sku = sku;
     this.eta = eta;
     this._purchasedQuantity = quantity;
@@ -117,5 +117,5 @@ export function allocate(line: OrderLine, batches: Array<Batch>) {
   if (allocateResult !== AllocateResult['SUCCESS']) {
     return allocateResult;
   }
-  return batch.reference;
+  return batch.id;
 }
