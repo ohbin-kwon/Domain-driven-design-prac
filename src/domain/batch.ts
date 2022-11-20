@@ -38,7 +38,7 @@ function _checkBatchesEta(batches: Array<Batch>) {
 
 export class OrderLine {
   constructor(
-    public orderId: number,
+    public orderId: string,
     public sku: string,
     public quantity: number,
   ) {

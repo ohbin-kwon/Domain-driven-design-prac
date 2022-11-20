@@ -13,7 +13,7 @@ import {
       id!: number;
   
       @Property({ type: 'int' })
-      orderId: number;
+      orderId: string;
   
       @Property({ type: 'text' })
       sku: string;
@@ -24,7 +24,7 @@ import {
       @ManyToOne('BatchEntity')
       batch!: BatchEntity;
   
-      constructor(orderId: number, sku: string, quantity: number, batch: BatchEntity) {
+      constructor(orderId: string, sku: string, quantity: number, batch: BatchEntity) {
           this.orderId = orderId;
           this.sku = sku;
           this.quantity = quantity;
