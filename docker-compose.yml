@@ -1,7 +1,7 @@
 version: '3.9'
 services:
   postgres:
-    profiles: ["test"]
+    profiles: ["test", "development"]
     image: postgres:14.5
     container_name: orderSystem
     restart: always
