@@ -20,7 +20,6 @@ describe('allocation service test', () => {
     const batch = new Batch('b1', 'LAMP', 100);
     const repo: IRepository = FakeRepository([batch]);
 
-    const result = await service().allocate(line, repo);
-    expect(result).toStrictEqual('invalid sku');
+    expect(async() => await service().allocate(line, repo)).rejects.toThrow(new Error('invalid sku - ' + line.sku));
   });
 });
