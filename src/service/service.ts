@@ -7,13 +7,14 @@ export function service(): IService {
     return batches.find(batch => batch.sku === sku)
   }
   return {
-    async allocate(orderLine: OrderLine, repo: IRepository){
+    async allocate(line: OrderLine, repo: IRepository){
       const batchList = await repo.list()
-      const validSku = isValidSku(orderLine.sku, batchList)
-      
-      if(validSku === undefined) return 'invalid sku'
 
-      const batchId = allocate(orderLine, batchList)
+      const validSku = isValidSku(line.sku, batchList)
+      if(validSku === undefined) throw new Error('invalid sku - ' + line.sku)
+
+      const batchId = allocate(line, batchList)
+      
       return batchId
     }
   }
