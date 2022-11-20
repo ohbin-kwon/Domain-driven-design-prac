@@ -73,6 +73,12 @@ describe('deallocate test', () => {
 describe('domain function(allocate line to batch) test', () => {
   test('test prefers current stock batches to shipment', () => {
     const inStockBatch = new Batch('in-stock-batch', 'CLOCK', 100);
+    const shipmentBatch = new Batch(
+      'shipment-batch',
+      'CLOCK',
+      100,
+      new Date('2022-08-25'),
+    );
     const line = new OrderLine('1', 'CLOCK', 10);
 
     allocate(line, [inStockBatch, shipmentBatch]);
@@ -82,22 +88,46 @@ describe('domain function(allocate line to batch) test', () => {
   });
 
   test('test prefers earlier batches', () => {
+    const earliest = new Batch(
+      'earliest-batch',
+      'CLOCK',
+      100,
+      new Date('2022-08-25'),
+    );
+    const medium = new Batch(
+      'medium-batch',
+      'CLOCK',
+      100,
+      new Date('2022-08-26'),
+    );
+    const latest = new Batch(
+      'latest-batch',
+      'CLOCK',
+      100,
+      new Date('2022-08-27'),
+    );
     const line = new OrderLine('1', 'CLOCK', 10);
 
-    allocate(line, [earliest, medium, latest])
+    allocate(line, [earliest, medium, latest]);
 
-    expect(earliest.availableQuantity).toBe(90)
-    expect(medium.availableQuantity).toBe(100)
-    expect(latest.availableQuantity).toBe(100)
-  })
+    expect(earliest.availableQuantity).toBe(90);
+    expect(medium.availableQuantity).toBe(100);
+    expect(latest.availableQuantity).toBe(100);
+  });
 
   test('test returns allocated batch id', () => {
     const inStockBatch = new Batch('in-stock-batch', 'CLOCK', 100);
+    const shipmentBatch = new Batch(
+      'shipment-batch',
+      'CLOCK',
+      100,
+      new Date('2022-08-25'),
+    );
     const line = new OrderLine('1', 'CLOCK', 10);
 
     const allocation = allocate(line, [inStockBatch, shipmentBatch]);
-    expect(allocation).toBe(inStockBatch.id)
-  })
+    expect(allocation).toBe(inStockBatch.id);
+  });
 });
 
 describe('out of stock exception', () => {
