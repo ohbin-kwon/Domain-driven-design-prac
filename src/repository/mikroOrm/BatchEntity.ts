@@ -40,15 +40,15 @@ export class BatchEntity {
       batch.eta,
     );
     
-    const allocations = [...batch._allocation].map(orderLine => new OrderLineEntity(
-      orderLine.orderId,
-      orderLine.sku,
-      orderLine.quantity,
+    const allocations = [...batch._allocation].map(line => new OrderLineEntity(
+      line.orderId,
+      line.sku,
+      line.quantity,
       newBatch
     ));
 
-    for (const orderLineEntity of allocations){
-      newBatch.allocations.add(orderLineEntity)
+    for (const entity of allocations){
+      newBatch.allocations.add(entity)
     }
     return newBatch
   }
