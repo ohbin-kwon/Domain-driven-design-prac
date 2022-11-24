@@ -1,4 +1,3 @@
-import request from 'supertest';
 import { Batch } from './domain/batch';
 import { IRepository } from './repository/IRepository';
 

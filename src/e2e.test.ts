@@ -3,7 +3,7 @@ import request from 'supertest';
 import { createE2EData } from './createE2EData';
 import { Batch } from './domain/batch';
 import { v4 } from 'uuid';
-import { configMikroOrm } from './repository/mikroOrm/config/configE2E';
+import { configMikroOrm } from './repository/mikroOrm/config/configDev';
 
 export const uuid = () => {
   const tokens = v4().split('-');

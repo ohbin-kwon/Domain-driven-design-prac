@@ -1,6 +1,6 @@
 import express from "express";
 import { OrderLine } from "./domain/batch";
-import { configMikroOrm } from "./repository/mikroOrm/config/configE2E";
+import { configMikroOrm } from "./repository/mikroOrm/config/configDev";
 import { service } from "./service/service";
 
 const app = express()
