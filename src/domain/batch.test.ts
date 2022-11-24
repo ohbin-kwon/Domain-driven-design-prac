@@ -130,13 +130,24 @@ describe('domain function(allocate line to batch) test', () => {
   });
 });
 
-describe('out of stock exception', () => {
-  test('test raises out of stock exception if cannot allocate', () => {
+describe('cannot allocate when batches are out of stock or sku is different', () => {
+  test('test cannot allocate stock if batches are out of stock', () => {
     const [batch, line] = makeBatchAndLine('LAMP', 10, 10);
-    allocate(line, [batch])
-    const secondLine = new OrderLine(1, 'LAMP', 1)
-    Object.freeze(secondLine)
-    expect(allocate(secondLine, [batch])).toBe('out of stock')
-  })
+    allocate(line, [batch]);
+    const secondLine = new OrderLine('1', 'LAMP', 1);
+    Object.freeze(secondLine);
+    expect(allocate(secondLine, [batch])).toBe(
+      'out of stock or sku is different',
+    );
+  });
 
-})
+  test('test cannot allocate stock if sku is different', () => {
+    const [batch, line] = makeBatchAndLine('LAMP', 10, 10);
+    allocate(line, [batch]);
+    const differentSkuLine = new OrderLine('1', 'CHAIR', 10);
+    Object.freeze(differentSkuLine);
+    expect(allocate(differentSkuLine, [batch])).toBe(
+      'out of stock or sku is different',
+    );
+  });
+});

@@ -75,9 +75,7 @@ export class Batch {
 
   allocate(line: OrderLine) {
     const allocateResult = this.canAllocate(line);
-    if (allocateResult !== AllocateResult['SUCCESS']) {
-      return allocateResult;
-    }
+    if (allocateResult !== AllocateResult['SUCCESS']) return allocateResult;
     this._allocation.add(line);
     return allocateResult;
   }
@@ -99,10 +97,14 @@ export class Batch {
 }
 
 export function allocate(line: OrderLine, batches: Array<Batch>) {
-  const batch = _checkBatchesEta(batches);
-  const allocateResult = batch.allocate(line);
-  if (allocateResult !== AllocateResult['SUCCESS']) {
-    return allocateResult;
-  }
-  return batch.id;
+  const allocatableBatch = batches.filter(
+    (batch) => batch.canAllocate(line) === AllocateResult['SUCCESS'],
+  );
+  if (allocatableBatch.length === 0)
+    return (
+      AllocateResult['OUT-OF-STOCK'] + ' or ' + AllocateResult['DIFFERENT-SKU']
+    );
+  const targetBatch = _checkBatchesEta(allocatableBatch);
+  targetBatch.allocate(line);
+  return targetBatch.id;
 }
