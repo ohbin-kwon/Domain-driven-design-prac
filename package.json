@@ -6,9 +6,9 @@
   "scripts": {
     "test": "NODE_ENV=test jest --testPathIgnorePatterns=/e2e --setupFiles --forceExit --detectOpenHandles",
     "e2e": "NODE_ENV=development jest e2e.test.ts --setupFiles --forceExit --detectOpenHandles",
-    "start": "node dist/src/server.js",
+    "start": "NODE_ENV=production node dist/src/server.js",
     "build": "tsc -p .",
-    "dev": "NODE_ENV=development nodemon --watch \"src/**/*.ts\" --exec \"ts-node\" src/server.ts",
+    "dev": "NODE_ENV=development nodemon --watch \"src/**/*.ts\" --exec \"ts-node\" --files src/server.ts",
     "postgres:up": "docker compose --env-file ./config/.env.test up -d postgres",
     "postgres:down": "docker compose --env-file ./config/.env.test down --remove-orphans",
     "postgres:migrate-create": "npx mikro-orm migration:create",
