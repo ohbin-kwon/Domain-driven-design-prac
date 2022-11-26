@@ -1,9 +1,9 @@
-import app from './app';
+import app from '../app';
 import request from 'supertest';
 import { createE2EData } from './createE2EData';
-import { Batch } from './domain/batch';
+import { Batch } from '../domain/batch';
 import { v4 } from 'uuid';
-import { configMikroOrm } from './repository/mikroOrm/config/configDev';
+import { setupMikroOrmRepo } from '../repository/mikroOrm/config/setupRepo';
 
 export const uuid = () => {
   const tokens = v4().split('-');
@@ -33,7 +33,7 @@ describe('e2e senario: production orm is mikroOrm', () => {
     );
     const OTHER_BATCH = new Batch(otherBatchId, otherSku, 100);
 
-    await createE2EData(configMikroOrm, [
+    await createE2EData(setupMikroOrmRepo, [
       EARLY_BATCH,
       LATER_BATCH,
       OTHER_BATCH,
