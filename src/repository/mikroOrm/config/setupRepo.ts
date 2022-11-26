@@ -6,17 +6,19 @@ import config from './configOrm';
 let orm: MikroORM<PostgreSqlDriver>;
 let generator: SchemaGenerator;
 
-export async function setupMikroOrmRepo() {
+export async function setupMikroOrmRepo(env: NODE_ENV) {
   orm = await MikroORM.init<PostgreSqlDriver>(config);
-
-  generator = orm.getSchemaGenerator();
-  await generator.createSchema();
-
+  if(env === 'test'){
+    generator = orm.getSchemaGenerator();
+    await generator.createSchema();
+  }
   const em = orm.em.fork();
   return MikroOrmRepository(em);
 }
 
-export async function tearDownMikroOrm() {
-  await generator.dropSchema();
+export async function tearDownMikroOrm(env: NODE_ENV) {
+  if(env === 'test'){
+    await generator.dropSchema();
+  }
   orm.close();
 }
