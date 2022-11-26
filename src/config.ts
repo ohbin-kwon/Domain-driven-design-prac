@@ -1,10 +1,10 @@
 import path from "path";
 import dotenv from "dotenv";
-import { ENV_PATH } from "../const";
+import { ENV_PATH } from "./const";
 dotenv.config({ path: path.resolve(__dirname, ENV_PATH) });
 
 interface ENV {
-  NODE_ENV: string | undefined;
+  NODE_ENV: NODE_ENV | undefined;
   POSTGRES_DB_NAME: string | undefined;
   POSTGRES_USER_NAME: string | undefined;
   POSTGRES_PASSWORD: string | undefined;
@@ -15,7 +15,7 @@ interface ENV {
 }
 
 interface Config {
-  NODE_ENV: string;
+  NODE_ENV: NODE_ENV;
   POSTGRES_DB_NAME: string;
   POSTGRES_USER_NAME: string;
   POSTGRES_PASSWORD: string;
@@ -27,7 +27,7 @@ interface Config {
 
 const getConfig = (): ENV => {
   return {
-    NODE_ENV: process.env.NODE_ENV,
+    NODE_ENV: process.env.NODE_ENV ? process.env.NODE_ENV as NODE_ENV : undefined,
     POSTGRES_DB_NAME: process.env.POSTGRES_DB_NAME,
     POSTGRES_USER_NAME: process.env.POSTGRES_USER_NAME,
     POSTGRES_PASSWORD: process.env.POSTGRES_PASSWORD,
