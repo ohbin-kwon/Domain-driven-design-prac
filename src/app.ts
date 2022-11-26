@@ -1,5 +1,4 @@
 import express from "express";
-import { OrderLine } from "./domain/batch";
 import { setupMikroOrmRepo } from "./repository/mikroOrm/config/setupRepo";
 import { service } from "./service/service";
 import config from "./config"
@@ -12,9 +11,8 @@ app.post('/allocate', async (req, res) => {
   const {orderId, sku, qty} = req.body
   
   const repo = await setupMikroOrmRepo(config.NODE_ENV)
-  const line = new OrderLine(orderId, sku, qty)
   try{
-    const batchId = await service().allocate(line, repo)
+    const batchId = await service().allocate(orderId, sku, qty, repo)
     res.status(201).send({batchId})
   }catch(error){
     let message;
