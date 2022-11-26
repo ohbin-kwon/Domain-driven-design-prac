@@ -10,16 +10,16 @@ const NEW_BATCH = new Batch(
 
 export function createRepoTest(
   label: string,
-  setupRepo: () => Promise<IRepository>,
-  teardown: () => Promise<void> = async () => undefined,
+  setupRepo: (env: NODE_ENV) => Promise<IRepository>,
+  teardown: (env: NODE_ENV) => Promise<void> = async () => undefined,
 ) {
   describe(label, () => {
     afterEach(async () => {
-      await teardown();
+      await teardown('test');
     });
 
     it('batch test', async () => {
-      const repo = await setupRepo();
+      const repo = await setupRepo('test');
 
       expect(await repo.get('batch-1')).toStrictEqual(null);
 
