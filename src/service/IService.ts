@@ -3,10 +3,10 @@ import { IRepository } from '../repository/IRepository';
 
 export interface IService {
   allocate: (
+    repo: IRepository,
     orderId: string,
     sku: string,
     quantity: number,
-    repo: IRepository,
   ) => Promise<string>;
   addBatch: (
     repo: IRepository,

@@ -12,7 +12,7 @@ describe('allocation service test', () => {
     const batch = new Batch('b1', 'TABLE', 100);
     const repo: IRepository = FakeRepository([batch]);
 
-    const result = await service().allocate(orderId, sku, quantity, repo);
+    const result = await service().allocate(repo, orderId, sku, quantity);
 
     expect(result).toStrictEqual('b1');
   });
@@ -25,7 +25,7 @@ describe('allocation service test', () => {
     const repo: IRepository = FakeRepository([batch]);
 
     expect(
-      async () => await service().allocate(orderId, sku, quantity, repo),
+      async () => await service().allocate(repo, orderId, sku, quantity),
     ).rejects.toThrow(new Error('invalid sku - ' + sku));
   });
 

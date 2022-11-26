@@ -12,7 +12,7 @@ app.post('/allocate', async (req, res) => {
   
   const repo = await setupMikroOrmRepo(config.NODE_ENV)
   try{
-    const batchId = await service().allocate(orderId, sku, qty, repo)
+    const batchId = await service().allocate(repo, orderId, sku, qty)
     res.status(201).send({batchId})
   }catch(error){
     let message;

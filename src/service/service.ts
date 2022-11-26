@@ -8,10 +8,10 @@ export function service(): IService {
   }
   return {
     async allocate(
+      repo: IRepository,
       orderId: string,
       sku: string,
       quantity: number,
-      repo: IRepository,
     ) {
       const batchList = await repo.list();
 
