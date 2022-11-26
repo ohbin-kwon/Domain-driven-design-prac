@@ -24,5 +24,14 @@ export function service(): IService {
 
       return batchId;
     },
+    async addBatch(
+      repo: IRepository,
+      id: string,
+      sku: string,
+      quantity: number,
+      eta?: Date,
+    ) {
+      await repo.save(new Batch(id, sku, quantity, eta));
+    },
   };
 }

@@ -8,4 +8,11 @@ export interface IService {
     quantity: number,
     repo: IRepository,
   ) => Promise<string>;
+  addBatch: (
+    repo: IRepository,
+    id: string,
+    sku: string,
+    quantity: number,
+    eta?: Date,
+  ) => Promise<void>;
 }

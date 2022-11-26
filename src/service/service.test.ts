@@ -28,4 +28,10 @@ describe('allocation service test', () => {
       async () => await service().allocate(orderId, sku, quantity, repo),
     ).rejects.toThrow(new Error('invalid sku - ' + sku));
   });
+
+  it('test_add_batch', async () => {
+    const repo: IRepository = FakeRepository([])
+    await service().addBatch(repo, 'b1', "CHAIR", 100)
+    expect(await repo.get('b1')).toStrictEqual(new Batch('b1', "CHAIR", 100))
+  })
 });
