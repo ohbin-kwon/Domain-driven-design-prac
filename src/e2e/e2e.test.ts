@@ -1,13 +1,14 @@
 import app from '../app';
 import request from 'supertest';
-import { createE2EData } from './createE2EData';
-import { Batch } from '../domain/batch';
 import { v4 } from 'uuid';
-import { setupMikroOrmRepo } from '../repository/mikroOrm/config/setupRepo';
 
-export const uuid = () => {
+const uuid = () => {
   const tokens = v4().split('-');
   return tokens[2] + tokens[1] + tokens[0] + tokens[3] + tokens[4];
+};
+
+const addBatch = async (id: string, sku: string, qty: number, eta?: Date) => {
+  await request(app).post('/batch').send({ id, sku, qty, eta }).expect(201);
 };
 
 describe('e2e senario: production orm is mikroOrm', () => {
@@ -19,24 +20,10 @@ describe('e2e senario: production orm is mikroOrm', () => {
     const otherSku = uuid();
     const orderId = uuid();
 
-    const EARLY_BATCH = new Batch(
-      earlyBatchId,
-      sku,
-      100,
-      new Date('2022-08-11'),
-    );
-    const LATER_BATCH = new Batch(
-      laterBatchId,
-      sku,
-      100,
-      new Date('2022-08-13'),
-    );
-    const OTHER_BATCH = new Batch(otherBatchId, otherSku, 100);
-
-    await createE2EData(setupMikroOrmRepo, [
-      EARLY_BATCH,
-      LATER_BATCH,
-      OTHER_BATCH,
+    await Promise.all([
+      addBatch(earlyBatchId, sku, 100, new Date('2022-08-11')),
+      addBatch(laterBatchId, sku, 100, new Date('2022-08-13')),
+      addBatch(otherBatchId, otherSku, 100),
     ]);
 
     const data = { orderId, sku, qty: 3 };
