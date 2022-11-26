@@ -1,18 +1,17 @@
 import express from "express";
 import { OrderLine } from "./domain/batch";
-import { configMikroOrm } from "./repository/mikroOrm/config/configDev";
+import { setupMikroOrmRepo } from "./repository/mikroOrm/config/setupRepo";
 import { service } from "./service/service";
+import config from "./config"
 
 const app = express()
 
 app.use(express.json())
 
-
-
 app.post('/allocate', async (req, res) => {
   const {orderId, sku, qty} = req.body
-
-  const repo = await configMikroOrm()
+  
+  const repo = await setupMikroOrmRepo(config.NODE_ENV)
   const line = new OrderLine(orderId, sku, qty)
   try{
     const batchId = await service().allocate(line, repo)
