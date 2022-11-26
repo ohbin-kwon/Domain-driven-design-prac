@@ -79,9 +79,11 @@ describe('domain function(allocate line to batch) test', () => {
       100,
       new Date('2022-08-25'),
     );
-    const line = new OrderLine('1', 'CLOCK', 10);
+    const orderId = '1';
+    const sku = 'CLOCK';
+    const quantity = 10;
 
-    allocate(line, [inStockBatch, shipmentBatch]);
+    allocate(orderId, sku, quantity, [inStockBatch, shipmentBatch]);
 
     expect(inStockBatch.availableQuantity).toBe(90);
     expect(shipmentBatch.availableQuantity).toBe(100);
@@ -106,9 +108,11 @@ describe('domain function(allocate line to batch) test', () => {
       100,
       new Date('2022-08-27'),
     );
-    const line = new OrderLine('1', 'CLOCK', 10);
+    const orderId = '1';
+    const sku = 'CLOCK';
+    const quantity = 10;
 
-    allocate(line, [earliest, medium, latest]);
+    allocate(orderId, sku, quantity, [earliest, medium, latest]);
 
     expect(earliest.availableQuantity).toBe(90);
     expect(medium.availableQuantity).toBe(100);
@@ -123,30 +127,47 @@ describe('domain function(allocate line to batch) test', () => {
       100,
       new Date('2022-08-25'),
     );
-    const line = new OrderLine('1', 'CLOCK', 10);
+    const orderId = '1';
+    const sku = 'CLOCK';
+    const quantity = 10;
 
-    const allocation = allocate(line, [inStockBatch, shipmentBatch]);
+    const allocation = allocate(orderId, sku, quantity, [
+      inStockBatch,
+      shipmentBatch,
+    ]);
     expect(allocation).toBe(inStockBatch.id);
   });
 });
 
 describe('cannot allocate when batches are out of stock or sku is different', () => {
   test('test cannot allocate stock if batches are out of stock', () => {
-    const [batch, line] = makeBatchAndLine('LAMP', 10, 10);
-    allocate(line, [batch]);
-    const secondLine = new OrderLine('1', 'LAMP', 1);
-    Object.freeze(secondLine);
-    expect(allocate(secondLine, [batch])).toBe(
+    const batch = new Batch('batch-001', 'LAMP', 10, new Date('2022-08-25'));
+
+    const orderId = '1';
+    const sku = 'CLOCK';
+    const quantity = 10;
+
+    const secondOrderId = '1';
+    const secondSku = 'CLOCK';
+    const secondQuantity = 10;
+
+    allocate(orderId, sku, quantity, [batch]);
+    expect(allocate(secondOrderId, secondSku, secondQuantity, [batch])).toBe(
       'out of stock or sku is different',
     );
   });
 
   test('test cannot allocate stock if sku is different', () => {
-    const [batch, line] = makeBatchAndLine('LAMP', 10, 10);
-    allocate(line, [batch]);
-    const differentSkuLine = new OrderLine('1', 'CHAIR', 10);
-    Object.freeze(differentSkuLine);
-    expect(allocate(differentSkuLine, [batch])).toBe(
+    const batch = new Batch('batch-001', 'LAMP', 10, new Date('2022-08-25'));
+
+    const orderId = '1';
+    const sku = 'LAMP';
+    const quantity = 10;
+
+    const differentSku = 'LAMP';
+
+    allocate(orderId, sku, quantity, [batch]);
+    expect(allocate(orderId, differentSku, quantity, [batch])).toBe(
       'out of stock or sku is different',
     );
   });

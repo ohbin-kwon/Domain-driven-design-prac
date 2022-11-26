@@ -4,7 +4,6 @@ import {
   Property,
   ManyToOne
   } from '@mikro-orm/core';
-  import { OrderLine } from '../../domain/batch';
   import type { BatchEntity } from './BatchEntity';
   
   @Entity()
@@ -29,11 +28,6 @@ import {
           this.sku = sku;
           this.quantity = quantity;
           this.batch = batch;
-      }
-  
-      toDomain(): OrderLine {
-          const record = new OrderLine(this.orderId, this.sku, this.quantity);
-          return record;
       }
   }
   

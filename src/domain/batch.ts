@@ -96,7 +96,13 @@ export class Batch {
   }
 }
 
-export function allocate(line: OrderLine, batches: Array<Batch>) {
+export function allocate(
+  orderId: string,
+  sku: string,
+  quantity: number,
+  batches: Array<Batch>,
+) {
+  const line = new OrderLine(orderId, sku, quantity);
   const allocatableBatch = batches.filter(
     (batch) => batch.canAllocate(line) === AllocateResult['SUCCESS'],
   );
