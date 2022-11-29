@@ -1,8 +1,6 @@
-import { PostgreSqlDriver, SqlEntityManager } from '@mikro-orm/postgresql';
 import { Batch } from '../domain/batch';
 import { IRepository } from './IRepository';
 import { MikroOrmRepository } from './mikroOrm/repository';
-import { FakeRepository } from './fake/repository';
 
 const NEW_BATCH = new Batch(
   'batch-1',
@@ -10,8 +8,8 @@ const NEW_BATCH = new Batch(
   100,
   new Date('2022-08-13'),
 );
-
-
+// this test factory is for repository implementation
+// fake repository test is independent
 export function createRepoTest(
   label: string,
   setupSession: (env: NODE_ENV) => Promise<SESSION>,
