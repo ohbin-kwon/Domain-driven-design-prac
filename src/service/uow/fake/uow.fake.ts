@@ -1,5 +1,5 @@
-import { IUnitOfWork } from './IUow';
-import { FakeRepository } from '../../repository/fake/repository';
+import { IUnitOfWork } from '../IUow';
+import { FakeRepository } from '../../../repository/fake/repository';
 
 export function fakeUow(): IUnitOfWork {
   const repo = FakeRepository([])

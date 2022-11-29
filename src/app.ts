@@ -1,6 +1,6 @@
 import express from "express";
 import { service } from "./service/service";
-import { MikroOrmUow } from "./service/uow/uow.mikroOrm";
+import { MikroOrmUow } from "./service/uow/mikroOrm/uow.mikroOrm";
 
 const app = express()
 

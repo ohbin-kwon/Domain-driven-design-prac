@@ -1,5 +1,5 @@
-import { Batch } from "../../domain/batch";
-import { tearDownMikroOrm } from "../../repository/mikroOrm/config/setupOrm";
+import { Batch } from "../../../domain/batch";
+import { tearDownMikroOrm } from "../../../repository/mikroOrm/config/setupOrm";
 import { MikroOrmUow } from "./uow.mikroOrm";
 
 describe('allocation service test', () => {

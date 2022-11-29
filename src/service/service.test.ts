@@ -2,7 +2,7 @@ import { FakeRepository } from '../repository/fake/repository';
 import { IRepository } from '../repository/IRepository';
 import { service } from './service';
 import { IUnitOfWork } from './uow/IUow';
-import { fakeUow } from './uow/uow.fake';
+import { fakeUow } from './uow/fake/uow.fake';
 
 // 오케스트레이션을 분리해서 서비스 layer로 분리한다.
 describe('allocation service test', () => {
