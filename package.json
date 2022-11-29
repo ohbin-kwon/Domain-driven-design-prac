@@ -11,8 +11,8 @@
     "dev": "NODE_ENV=development nodemon --watch \"src/**/*.ts\" --exec \"ts-node\" --files src/server.ts",
     "postgres:up": "docker compose --env-file ./config/.env.test up -d postgres",
     "postgres:down": "docker compose --env-file ./config/.env.test down --remove-orphans",
-    "postgres:migrate-create": "npx mikro-orm migration:create",
-    "postgres:migrate-up": "npx mikro-orm migration:up"
+    "postgres:migrate-create": "NODE_ENV=development npx mikro-orm migration:create",
+    "postgres:migrate-up": "NODE_ENV=development npx mikro-orm migration:up"
   },
   "author": "ohbin kwon",
   "license": "ISC",
@@ -40,8 +40,8 @@
   "mikro-orm": {
     "useTsNode": true,
     "configPaths": [
-      "./src/repository/mikroOrm/config/config.ts",
-      "./dist/repository/mikroOrm/config/config.js"
+      "./src/repository/mikroOrm/config/configOrm.ts",
+      "./dist/repository/mikroOrm/config/configOrm.js"
     ]
   }
 }
