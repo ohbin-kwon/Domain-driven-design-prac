@@ -22,7 +22,7 @@ export function MikroOrmRepository(
     },
     async save(batch: Batch){
       const batchEntity = await BatchEntity.fromDomain(batch); // insert into batch, orderLine insertInto
-      await batchRepo.persistAndFlush(batchEntity);
+      batchRepo.persist(batchEntity);
     }
   };
 }
