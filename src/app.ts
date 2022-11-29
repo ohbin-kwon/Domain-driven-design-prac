@@ -1,7 +1,6 @@
 import express from "express";
-import { setupMikroOrmRepo } from "./repository/mikroOrm/config/setupRepo";
 import { service } from "./service/service";
-import config from "./config"
+import { MikroOrmUow } from "./service/uow/uow.mikroOrm";
 
 const app = express()
 
@@ -9,9 +8,8 @@ app.use(express.json())
 
 app.post('/batch', async(req, res) => {
   const {id, sku, qty, eta} = req.body
-  const repo = await setupMikroOrmRepo(config.NODE_ENV)
   try{
-    await service().addBatch(repo, id, sku, qty, eta)
+    await service().addBatch(await MikroOrmUow(), id, sku, qty, eta)
     res.status(201).end()
   } catch(error) {
     let message;
@@ -24,9 +22,8 @@ app.post('/batch', async(req, res) => {
 app.post('/allocate', async (req, res) => {
   const {orderId, sku, qty} = req.body
   
-  const repo = await setupMikroOrmRepo(config.NODE_ENV)
   try{
-    const batchId = await service().allocate(repo, orderId, sku, qty)
+    const batchId = await service().allocate(await MikroOrmUow(), orderId, sku, qty)
     res.status(201).send({batchId})
   }catch(error){
     let message;
