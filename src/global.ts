@@ -5,5 +5,5 @@ export {};
 
 declare global {
     type NODE_ENV = 'test' | 'development' | 'production';
-    type SESSION = SqlEntityManager<PostgreSqlDriver> | Batch[]
+    type SESSION = SqlEntityManager<PostgreSqlDriver>
 }

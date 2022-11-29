@@ -18,9 +18,6 @@ export function createRepoTest(
   teardown: (env: NODE_ENV) => Promise<void> = async () => undefined,
 ) {
   describe(label, () => {
-    function isMikroOrmSession(session: SESSION): session is SqlEntityManager<PostgreSqlDriver>{
-      return session instanceof SqlEntityManager<PostgreSqlDriver>
-    }
     afterEach(async () => {
       await teardown('test');
     });
@@ -28,16 +25,7 @@ export function createRepoTest(
     it('batch test', async () => {
       let repo: IRepository;
       const session = await setupSession('test')
-      console.log(isMikroOrmSession(session))
-      if(!isMikroOrmSession(session)) return
-      repo = MikroOrmRepository(session) 
-
-      // if(isMikroOrmSession(session)){
-      //   repo = MikroOrmRepository(session) 
-      // }
-      // else{
-      //   repo = FakeRepository(session)
-      // }
+      repo = MikroOrmRepository(session)
 
       expect(await repo.get('batch-1')).toStrictEqual(null);
 
