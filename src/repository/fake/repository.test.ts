@@ -6,7 +6,7 @@ let init: Batch[] = []
 
 createRepoTest('fakeRepoTest',
   async () => {
-    return FakeRepository(init)
+    return init
   },
   async () => {
     init.splice(0, init.length)
