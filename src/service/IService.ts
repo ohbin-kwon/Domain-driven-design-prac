@@ -1,15 +1,14 @@
-import { OrderLine } from '../domain/batch';
-import { IRepository } from '../repository/IRepository';
+import { IUnitOfWork } from './uow/IUow';
 
 export interface IService {
   allocate: (
-    repo: IRepository,
+    uow: IUnitOfWork,
     orderId: string,
     sku: string,
     quantity: number,
   ) => Promise<string>;
   addBatch: (
-    repo: IRepository,
+    uow: IUnitOfWork,
     id: string,
     sku: string,
     quantity: number,
