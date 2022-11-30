@@ -4,7 +4,7 @@ import { IUnitOfWork } from './IUow';
 // this test factory is for Uow implementation, fake Uow
 export function createUowTest(
   label: string,
-  setUpUow: () => Promise<IUnitOfWork>,
+  setUpUow: (sessionFunc?: (env: NODE_ENV) => Promise<SESSION>) => Promise<IUnitOfWork>,
   teardown: (env: NODE_ENV) => Promise<void> = async () => undefined,
 ) {
   describe(label, () => {
