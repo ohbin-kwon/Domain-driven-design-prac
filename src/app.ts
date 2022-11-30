@@ -9,7 +9,8 @@ app.use(express.json())
 app.post('/batch', async(req, res) => {
   const {id, sku, qty, eta} = req.body
   try{
-    await service().addBatch(await MikroOrmUow(), id, sku, qty, eta)
+    const uow = await MikroOrmUow()
+    await service().addBatch(uow, id, sku, qty, eta)
     res.status(201).end()
   } catch(error) {
     let message;
@@ -23,7 +24,8 @@ app.post('/allocate', async (req, res) => {
   const {orderId, sku, qty} = req.body
   
   try{
-    const batchId = await service().allocate(await MikroOrmUow(), orderId, sku, qty)
+    const uow = await MikroOrmUow()
+    const batchId = await service().allocate(uow , orderId, sku, qty)
     res.status(201).send({batchId})
   }catch(error){
     let message;
