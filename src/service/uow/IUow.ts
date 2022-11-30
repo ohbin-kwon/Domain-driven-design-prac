@@ -1,7 +1,9 @@
 import { IRepository } from "../../repository/IRepository";
 
 export interface IUnitOfWork {
-  batches: IRepository,
-  commit: () => void,
+  batches: IRepository
+  enter: () => void
+  commit: () => void
   rollback: () => void
+  exit: () => void
 }

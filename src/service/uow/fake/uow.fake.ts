@@ -6,11 +6,9 @@ export function FakeUow(): IUnitOfWork {
 
   return {
     batches: repo,
-    commit() {
-      return;
-    },
-    rollback() {
-      return;
-    },
+    enter() {},
+    commit() {},
+    rollback() {},
+    exit() {}
   };
 }

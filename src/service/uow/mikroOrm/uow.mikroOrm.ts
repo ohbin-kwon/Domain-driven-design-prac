@@ -1,20 +1,24 @@
 import { setUpMikroOrmSession } from '../../../repository/mikroOrm/config/setupOrm';
 import { MikroOrmRepository } from '../../../repository/mikroOrm/repository';
-import config from '../../../config';
 import { IUnitOfWork } from '../IUow';
+import config from '../../../config';
 
-export async function MikroOrmUow(): Promise<IUnitOfWork> {
-  const session = await setUpMikroOrmSession(config.NODE_ENV);
+export async function MikroOrmUow(
+  sessionFunc: (env: NODE_ENV) => Promise<SESSION> = setUpMikroOrmSession,
+): Promise<IUnitOfWork> {
+  const session = await sessionFunc(config.NODE_ENV);
   const repo = MikroOrmRepository(session);
-
   return {
     batches: repo,
+    enter() {
+      session.begin();
+    },
     commit() {
       session.flush();
-      return;
     },
     rollback() {
-      return;
+      session.rollback();
     },
+    exit() {},
   };
 }
