@@ -4,8 +4,18 @@ import { FakeUow } from './uow/fake/uow.fake';
 
 // 오케스트레이션을 분리해서 서비스 layer로 분리한다.
 describe('allocation service test', () => {
+  it('test add batch', async () => {
+    const uow = FakeUow();
+    const batchId = 'b1'
+    const sku = 'TABLE';
+    const batchQuantity = 100
+
+    await service().addBatch(uow, batchId, sku, batchQuantity)
+    
+    expect(uow.committed).toStrictEqual(true)
+  });
   it('test returns allocations', async () => {
-    const uow: IUnitOfWork = FakeUow();
+    const uow = FakeUow();
     const batchId = 'b1'
     const sku = 'TABLE';
     const batchQuantity = 100
@@ -20,7 +30,7 @@ describe('allocation service test', () => {
   });
 
   it('test error for invalid sku', async () => {
-    const uow: IUnitOfWork = FakeUow();
+    const uow = FakeUow();
     const batchId = 'b1'
     const batchSku = 'LAMP'
     const batchQuantity = 100
@@ -29,7 +39,6 @@ describe('allocation service test', () => {
     const orderQuantity = 10;
 
     await service().addBatch(uow, batchId, batchSku, batchQuantity)
-    uow.commit()
 
     expect(
       async () => await service().allocate(uow, orderId, orderSku, orderQuantity),

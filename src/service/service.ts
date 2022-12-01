@@ -23,7 +23,7 @@ export function service(): IService {
         const line = new OrderLine(orderId, sku, quantity);
 
         const batchId = allocate(line, batchList);
-        await uow.commit();
+        uow.commit();
         return batchId;
       });
 
@@ -38,7 +38,7 @@ export function service(): IService {
     ) {
       await withTransaction(uow, async (uow) => {
         await uow.batches.save(new Batch(id, sku, quantity, eta));
-        await uow.commit();
+        uow.commit();
       });
     },
   };
