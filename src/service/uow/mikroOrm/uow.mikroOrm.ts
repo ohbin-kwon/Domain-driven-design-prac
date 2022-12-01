@@ -10,13 +10,11 @@ export async function MikroOrmUow(
   const repo = MikroOrmRepository(session);
   return {
     batches: repo,
-    enter() {
-    },
+    enter() {},
     commit() {
       session.flush();
     },
-    rollback() {
-    },
+    rollback() {},
     exit() {},
   };
 }

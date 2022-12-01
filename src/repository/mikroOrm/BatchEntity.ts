@@ -39,26 +39,28 @@ export class BatchEntity {
       batch.quantity,
       batch.eta,
     );
-    
-    const allocations = [...batch._allocation].map(line => new OrderLineEntity(
-      line.orderId,
-      line.sku,
-      line.quantity,
-      newBatch
-    ));
 
-    for (const entity of allocations){
-      newBatch.allocations.add(entity)
+    const allocations = [...batch._allocation].map(
+      (line) =>
+        new OrderLineEntity(line.orderId, line.sku, line.quantity, newBatch),
+    );
+
+    for (const entity of allocations) {
+      newBatch.allocations.add(entity);
     }
-    return newBatch
+    return newBatch;
   }
 
   async toDomain(): Promise<Batch> {
     const record = new Batch(this.id, this.sku, this.quantity, this.eta);
-    
-    if(this.allocations.isInitialized() === false) return record
-    
-    record._allocation = new Set(this.allocations.getItems().map(o => new OrderLine(o.orderId, o.sku, o.quantity)));
+
+    if (this.allocations.isInitialized() === false) return record;
+
+    record._allocation = new Set(
+      this.allocations
+        .getItems()
+        .map((o) => new OrderLine(o.orderId, o.sku, o.quantity)),
+    );
     return record;
   }
 }

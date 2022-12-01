@@ -1,9 +1,8 @@
-import { PostgreSqlDriver, SqlEntityManager } from "@mikro-orm/postgresql";
-import { Batch } from "./domain/batch";
+import { PostgreSqlDriver, SqlEntityManager } from '@mikro-orm/postgresql';
 
 export {};
 
 declare global {
-    type NODE_ENV = 'test' | 'development' | 'production';
-    type SESSION = SqlEntityManager<PostgreSqlDriver>
+  type NODE_ENV = 'test' | 'development' | 'production';
+  type SESSION = SqlEntityManager<PostgreSqlDriver>;
 }

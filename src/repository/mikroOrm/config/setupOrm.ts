@@ -7,16 +7,16 @@ let generator: SchemaGenerator;
 
 export async function setUpMikroOrmSession(env: NODE_ENV) {
   orm = await MikroORM.init<PostgreSqlDriver>(configOrm);
-  if(env === 'test'){
+  if (env === 'test') {
     generator = orm.getSchemaGenerator();
     await generator.createSchema();
   }
-  const session = orm.em.fork({flushMode: 0});
-  return session
+  const session = orm.em.fork({ flushMode: 0 });
+  return session;
 }
 // only for test
 export async function tearDownMikroOrm(env: NODE_ENV) {
-  if(env === 'test'){
+  if (env === 'test') {
     await generator.dropSchema();
   }
   orm.close();

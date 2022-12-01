@@ -8,5 +8,5 @@ export default {
   user: config.POSTGRES_USER_NAME,
   password: config.POSTGRES_PASSWORD,
   port: config.POSTGRES_PORT,
-  type: "postgresql" as "postgresql"
+  type: 'postgresql' as 'postgresql',
 };

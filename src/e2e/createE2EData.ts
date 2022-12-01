@@ -5,6 +5,6 @@ export async function createE2EData(
   setupRepo: (env: NODE_ENV) => Promise<IRepository>,
   batches: Batch[],
 ) {
-  const repo = await setupRepo('development')
-  Promise.all(batches.map(batch => repo.save(batch)))
+  const repo = await setupRepo('development');
+  Promise.all(batches.map((batch) => repo.save(batch)));
 }
