@@ -11,13 +11,11 @@ export async function MikroOrmUow(
   return {
     batches: repo,
     enter() {
-      session.begin();
     },
     commit() {
       session.flush();
     },
     rollback() {
-      session.rollback();
     },
     exit() {},
   };
