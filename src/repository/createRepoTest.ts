@@ -20,12 +20,12 @@ export function createRepoTest(
       const session = await setupSession('test');
       repo = MikroOrmRepository(session);
 
-      expect(await repo.get('batch-1')).toStrictEqual(null);
+      expect(await repo.get({ id: 'batch-1' })).toStrictEqual(null);
 
       await repo.save(NEW_BATCH);
       session.flush();
 
-      expect(await repo.get('batch-1')).toStrictEqual(NEW_BATCH);
+      expect(await repo.get({ id: 'batch-1' })).toStrictEqual(NEW_BATCH);
 
       const batches = await repo.list();
 

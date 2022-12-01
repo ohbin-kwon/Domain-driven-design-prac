@@ -14,11 +14,11 @@ describe('fakeRepoTest', () => {
   it('batch test', async () => {
     let repo: IRepository = FakeRepository(init);
 
-    expect(await repo.get('batch-1')).toStrictEqual(null);
+    expect(await repo.get({ id: 'batch-1' })).toStrictEqual(null);
 
     await repo.save(NEW_BATCH);
 
-    expect(await repo.get('batch-1')).toStrictEqual(NEW_BATCH);
+    expect(await repo.get({ id: 'batch-1' })).toStrictEqual(NEW_BATCH);
 
     const batches = await repo.list();
 
