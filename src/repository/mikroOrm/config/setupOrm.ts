@@ -14,7 +14,7 @@ export async function setUpMikroOrmSession(env: NODE_ENV) {
   const session = orm.em.fork({flushMode: 0});
   return session
 }
-
+// only for test
 export async function tearDownMikroOrm(env: NODE_ENV) {
   if(env === 'test'){
     await generator.dropSchema();
