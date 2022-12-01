@@ -7,8 +7,11 @@ export function FakeRepository(init: Batch[]): IRepository {
     async list(): Promise<Batch[]> {
       return repo;
     },
-    async get(id: string): Promise<Batch | null> {
-      const targetBatch = repo.find((batch) => batch.id === id);
+    async get<T extends BATCH_COLUMN>(filter: FILTER<T>): Promise<Batch | null> {
+      let targetColumn = Object.keys(filter)[0] as T;
+      const targetBatch = repo.find(
+        (batch) => batch[targetColumn] === filter[targetColumn],
+      );
       if (targetBatch === undefined) return null;
       return targetBatch;
     },

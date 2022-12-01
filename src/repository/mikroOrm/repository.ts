@@ -15,8 +15,8 @@ export function MikroOrmRepository(
         batchEntityList.map((batchEntity) => batchEntity.toDomain()),
       );
     },
-    async get(id: string): Promise<Batch | null> {
-      const batchEntity = await batchRepo.findOne({ id });
+    async get<T extends BATCH_COLUMN>(filter: FILTER<T>): Promise<Batch | null> {
+      const batchEntity = await batchRepo.findOne(filter);
       const batch = await batchEntity?.toDomain();
       return batch ?? null;
     },
