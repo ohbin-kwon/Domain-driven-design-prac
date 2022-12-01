@@ -41,5 +41,20 @@ export function service(): IService {
         uow.commit();
       });
     },
+    async reAllocate(
+      uow: IUnitOfWork,
+      orderId: string,
+      sku: string,
+      quantity: number,
+    ) {
+      const line = new OrderLine(orderId, sku, quantity);
+      await withTransaction(uow, async (uow) => {
+        const batch = await uow.batches.get({ sku });
+        if (batch === null) throw new Error('invalid sku - ' + sku);
+        batch.deallocate(line);
+        allocate(line, [batch]);
+        uow.commit();
+      });
+    },
   };
 }
