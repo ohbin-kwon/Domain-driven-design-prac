@@ -27,4 +27,17 @@ describe('fake uow test', () => {
 
     expect(uow.committed).toStrictEqual(false);
   });
+  it('test rollback on error', async () => {
+    const uow = FakeUow();
+    const batch = new Batch('b1', 'CHAIR', 100);
+
+    try {
+      await withTransaction(uow, async (uow) => {
+        await uow.batches.save(batch);
+        throw new Error('custom error');
+      });
+    } catch {
+      expect(uow.committed).toStrictEqual(false);
+    }
+  });
 });

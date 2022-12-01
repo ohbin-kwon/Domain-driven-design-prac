@@ -35,5 +35,19 @@ export function createUowTest(
       const list = await uow.batches.list();
       expect(list).toStrictEqual([]);
     });
+    it('test rollback on error', async () => {
+      const uow = await setUpUow();
+      const batch = new Batch('b1', 'CHAIR', 100);
+
+      try {
+        await withTransaction(uow, async (uow) => {
+          await uow.batches.save(batch);
+          throw new Error('custom error');
+        });
+      } catch {
+        const list = await uow.batches.list();
+        expect(list).toStrictEqual([]);
+      }
+    });
   });
 }
