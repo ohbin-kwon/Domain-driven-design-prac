@@ -1,7 +1,7 @@
 import { MikroORM } from '@mikro-orm/core';
 import { PostgreSqlDriver } from '@mikro-orm/postgresql';
 import { Batch } from '../../domain/batch';
-import { IRepository } from '../IRepository';
+import { BatchSpecificProps, Filter, IRepository } from '../IRepository';
 import { BatchEntity } from './BatchEntity';
 
 export function MikroOrmRepository(
@@ -15,7 +15,7 @@ export function MikroOrmRepository(
         batchEntityList.map((batchEntity) => batchEntity.toDomain()),
       );
     },
-    async get<T extends BATCH_COLUMN>(filter: FILTER<T>): Promise<Batch | null> {
+    async get<T extends BatchSpecificProps>(filter: Filter<T>): Promise<Batch | null> {
       const batchEntity = await batchRepo.findOne(filter);
       const batch = await batchEntity?.toDomain();
       return batch ?? null;
