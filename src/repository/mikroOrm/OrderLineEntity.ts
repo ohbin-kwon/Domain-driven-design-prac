@@ -1,5 +1,5 @@
 import { Entity, PrimaryKey, Property, ManyToOne } from '@mikro-orm/core';
-import { OrderLine } from '../../domain/batch';
+import { OrderLine } from '../../domain/product';
 import type { BatchEntity } from './BatchEntity';
 
 @Entity()

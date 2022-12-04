@@ -1,4 +1,4 @@
-import { Batch } from '../../domain/batch';
+import { Batch } from '../../domain/product';
 import { withTransaction } from '../transaction';
 import { IUnitOfWork } from './IUow';
 

@@ -1,4 +1,4 @@
-import { Batch } from '../domain/batch';
+import { Batch } from '../domain/product';
 import { IRepository } from '../repository/IRepository';
 
 export async function createE2EData(

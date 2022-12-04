@@ -1,4 +1,4 @@
-import { Batch, OrderLine, Product } from './batch';
+import { Batch, OrderLine, Product } from './product';
 // batchQuantity, lineQuantity에 맞는 batch와 line을 만들어내는 함수
 function makeBatchAndLine(
   sku: string,

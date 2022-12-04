@@ -1,4 +1,4 @@
-import { Batch } from '../domain/batch';
+import { Batch } from '../domain/product';
 import { IRepository } from './IRepository';
 import { MikroOrmRepository } from './mikroOrm/repository';
 

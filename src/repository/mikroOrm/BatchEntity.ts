@@ -5,7 +5,7 @@ import {
   OneToMany,
   Collection,
 } from '@mikro-orm/core';
-import { Batch, OrderLine } from '../../domain/batch';
+import { Batch, OrderLine } from '../../domain/product';
 import { OrderLineEntity } from './OrderLineEntity';
 
 @Entity()

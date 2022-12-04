@@ -1,4 +1,4 @@
-import { Product } from '../domain/batch';
+import { Product } from '../domain/product';
 
 export type ProductSpecificProps = GetKeysByValueType<Product, string>;
 export type Filter<T extends ProductSpecificProps> = { [key in T]: string };

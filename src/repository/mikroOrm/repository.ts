@@ -1,6 +1,6 @@
 import { MikroORM } from '@mikro-orm/core';
 import { PostgreSqlDriver } from '@mikro-orm/postgresql';
-import { Batch } from '../../domain/batch';
+import { Batch } from '../../domain/product';
 import { BatchSpecificProps, Filter, IRepository } from '../IRepository';
 import { BatchEntity } from './BatchEntity';
 
