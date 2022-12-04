@@ -1,10 +1,12 @@
-import { Batch } from '../domain/batch';
+import { Product } from '../domain/batch';
 
-export type BatchSpecificProps = GetKeysByValueType<Batch, string>;
-export type Filter<T extends BatchSpecificProps> = { [key in T]: string };
+export type ProductSpecificProps = GetKeysByValueType<Product, string>;
+export type Filter<T extends ProductSpecificProps> = { [key in T]: string };
 
 export interface IRepository {
-  get: <T extends BatchSpecificProps>(filter: Filter<T>) => Promise<Batch | null>;
-  save: (batch: Batch) => Promise<void>;
-  list: () => Promise<Batch[]>;
+  get: <T extends ProductSpecificProps>(
+    filter: Filter<T>,
+  ) => Promise<Product | null>;
+  save: (batch: Product) => Promise<void>;
+  list: () => Promise<Product[]>;
 }
