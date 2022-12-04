@@ -1,14 +1,14 @@
 import { IUnitOfWork } from '../IUow';
 import { FakeRepository } from '../../../repository/fake/repository';
-import { Batch } from '../../../domain/batch';
+import { Product } from '../../../domain/product';
 
 export function FakeUow(
-  session: Batch[] = [],
+  session: Product[] = [],
 ): IUnitOfWork & { committed: boolean } {
   const repo = FakeRepository(session);
   return {
     committed: false,
-    batches: repo,
+    products: repo,
     enter() {},
     commit() {
       this.committed = true;
