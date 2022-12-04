@@ -1,4 +1,4 @@
-import { Batch, OrderLine, allocate } from './batch';
+import { Batch, OrderLine, Product } from './batch';
 // batchQuantity, lineQuantity에 맞는 batch와 line을 만들어내는 함수
 function makeBatchAndLine(
   sku: string,
@@ -70,7 +70,7 @@ describe('deallocate test', () => {
   });
 });
 
-describe('domain function(allocate line to batch) test', () => {
+describe('product test', () => {
   test('test prefers current stock batches to shipment', () => {
     const inStockBatch = new Batch('in-stock-batch', 'CLOCK', 100);
     const shipmentBatch = new Batch(
@@ -80,8 +80,9 @@ describe('domain function(allocate line to batch) test', () => {
       new Date('2022-08-25'),
     );
     const line = new OrderLine('1', 'CLOCK', 10);
+    const product = new Product('CLOCK', [inStockBatch, shipmentBatch]);
 
-    allocate(line, [inStockBatch, shipmentBatch]);
+    product.allocate(line);
 
     expect(inStockBatch.availableQuantity).toBe(90);
     expect(shipmentBatch.availableQuantity).toBe(100);
@@ -108,7 +109,9 @@ describe('domain function(allocate line to batch) test', () => {
     );
     const line = new OrderLine('1', 'CLOCK', 10);
 
-    allocate(line, [earliest, medium, latest]);
+    const product = new Product('CLOCK', [earliest, medium, latest]);
+
+    product.allocate(line);
 
     expect(earliest.availableQuantity).toBe(90);
     expect(medium.availableQuantity).toBe(100);
@@ -124,29 +127,37 @@ describe('domain function(allocate line to batch) test', () => {
       new Date('2022-08-25'),
     );
     const line = new OrderLine('1', 'CLOCK', 10);
+    const product = new Product('CLOCK', [inStockBatch, shipmentBatch]);
 
-    const allocation = allocate(line, [inStockBatch, shipmentBatch]);
-    expect(allocation).toBe(inStockBatch.id);
+    expect(product.allocate(line)).toBe(inStockBatch.id);
   });
 });
 
 describe('cannot allocate when batches are out of stock or sku is different', () => {
   test('test cannot allocate stock if batches are out of stock', () => {
     const [batch, line] = makeBatchAndLine('LAMP', 10, 10);
-    allocate(line, [batch]);
+    const product = new Product('CLOCK', [batch]);
+
+    product.allocate(line);
+
     const secondLine = new OrderLine('1', 'LAMP', 1);
     Object.freeze(secondLine);
-    expect(allocate(secondLine, [batch])).toBe(
+
+    expect(product.allocate(secondLine)).toBe(
       'out of stock or sku is different',
     );
   });
 
   test('test cannot allocate stock if sku is different', () => {
     const [batch, line] = makeBatchAndLine('LAMP', 10, 10);
-    allocate(line, [batch]);
+    const product = new Product('CLOCK', [batch]);
+
+    product.allocate(line);
+
     const differentSkuLine = new OrderLine('1', 'CHAIR', 10);
     Object.freeze(differentSkuLine);
-    expect(allocate(differentSkuLine, [batch])).toBe(
+
+    expect(product.allocate(differentSkuLine)).toBe(
       'out of stock or sku is different',
     );
   });
