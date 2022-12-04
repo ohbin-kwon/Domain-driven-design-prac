@@ -1,28 +1,29 @@
 import { MikroORM } from '@mikro-orm/core';
 import { PostgreSqlDriver } from '@mikro-orm/postgresql';
-import { Batch } from '../../domain/product';
-import { BatchSpecificProps, Filter, IRepository } from '../IRepository';
+import { Batch, Product } from '../../domain/product';
+import { ProductSpecificProps, Filter, IRepository } from '../IRepository';
 import { BatchEntity } from './BatchEntity';
+import { ProductEntity } from './ProductEntity';
 
 export function MikroOrmRepository(
   em: MikroORM<PostgreSqlDriver>['em'],
 ): IRepository {
-  const batchRepo = em.getRepository(BatchEntity);
+  const productRepo = em.getRepository(ProductEntity);
   return {
-    async list(): Promise<Batch[]> {
-      const batchEntityList = await batchRepo.findAll();
+    async get<T extends ProductSpecificProps>(filter: Filter<T>) {
+      const productEntity = await productRepo.findOne(filter);
+      const product = await productEntity?.toDomain();
+      return product ?? null;
+    },
+    async save(product: Product) {
+      const productEntity = await ProductEntity.fromDomain(product); // insert into batch, orderLine insertInto
+      productRepo.persist(productEntity);
+    },
+    async list() {
+      const productEntityList = await productRepo.findAll();
       return Promise.all(
-        batchEntityList.map((batchEntity) => batchEntity.toDomain()),
+        productEntityList.map((productEntity) => productEntity.toDomain()),
       );
-    },
-    async get<T extends BatchSpecificProps>(filter: Filter<T>): Promise<Batch | null> {
-      const batchEntity = await batchRepo.findOne(filter);
-      const batch = await batchEntity?.toDomain();
-      return batch ?? null;
-    },
-    async save(batch: Batch) {
-      const batchEntity = await BatchEntity.fromDomain(batch); // insert into batch, orderLine insertInto
-      batchRepo.persist(batchEntity);
     },
   };
 }
