@@ -4,10 +4,7 @@ import type { BatchEntity } from './BatchEntity';
 
 @Entity()
 export class OrderLineEntity {
-  @PrimaryKey({ type: 'int', autoincrement: true })
-  id!: number;
-
-  @Property({ type: 'int' })
+  @PrimaryKey({ type: 'text'})
   orderId: string;
 
   @Property({ type: 'text' })

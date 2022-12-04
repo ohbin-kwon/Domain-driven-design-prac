@@ -4,17 +4,16 @@ import {
   Property,
   OneToMany,
   Collection,
+  ManyToOne,
 } from '@mikro-orm/core';
 import { Batch, OrderLine } from '../../domain/product';
 import { OrderLineEntity } from './OrderLineEntity';
+import { ProductEntity } from './ProductEntity';
 
 @Entity()
 export class BatchEntity {
   @PrimaryKey({ type: 'text' })
   id!: string;
-
-  @OneToMany('OrderLineEntity', 'batch')
-  allocations = new Collection<OrderLineEntity>(this);
 
   @Property({ type: 'text' })
   sku: string;
@@ -22,21 +21,35 @@ export class BatchEntity {
   @Property({ type: 'int' })
   quantity: number;
 
+  @OneToMany('OrderLineEntity', 'batch')
+  allocations = new Collection<OrderLineEntity>(this);
+
+  @ManyToOne('ProductEntity')
+  product!: ProductEntity;
+
   @Property({ type: 'date', nullable: true })
   eta?: Date;
 
-  constructor(id: string, sku: string, quantity: number, eta?: Date) {
+  constructor(
+    id: string,
+    sku: string,
+    quantity: number,
+    product: ProductEntity,
+    eta?: Date,
+  ) {
     this.id = id;
     this.sku = sku;
     this.quantity = quantity;
+    this.product = product;
     this.eta = eta;
   }
 
-  static async fromDomain(batch: Batch) {
+  static async fromDomain(batch: Batch, product: ProductEntity) {
     const newBatch = new BatchEntity(
       batch.id,
       batch.sku,
       batch.quantity,
+      product,
       batch.eta,
     );
 
