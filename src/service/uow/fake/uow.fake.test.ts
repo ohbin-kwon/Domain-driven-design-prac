@@ -1,9 +1,9 @@
-import { Batch } from '../../../domain/batch';
+import { Batch, Product } from '../../../domain/product';
 import { withTransaction } from '../../transaction';
 import { FakeUow } from './uow.fake';
 
 describe('fake uow test', () => {
-  let init: Batch[] = [];
+  let init: Product[] = [];
 
   afterEach(async () => {
     init.splice(0, init.length);
@@ -11,8 +11,9 @@ describe('fake uow test', () => {
   it('test commit', async () => {
     const uow = FakeUow(init);
     const batch = new Batch('b1', 'CHAIR', 100);
+    const product = new Product('CHAIR', [batch]);
     await withTransaction(uow, async (uow) => {
-      await uow.batches.save(batch);
+      await uow.products.save(product);
       uow.commit();
     });
 
@@ -21,8 +22,9 @@ describe('fake uow test', () => {
   it('test rollback uncommitted work', async () => {
     const uow = FakeUow(init);
     const batch = new Batch('b1', 'CHAIR', 100);
+    const product = new Product('CHAIR', [batch]);
     await withTransaction(uow, async (uow) => {
-      await uow.batches.save(batch);
+      await uow.products.save(product);
     });
 
     expect(uow.committed).toStrictEqual(false);
@@ -30,10 +32,11 @@ describe('fake uow test', () => {
   it('test rollback on error', async () => {
     const uow = FakeUow();
     const batch = new Batch('b1', 'CHAIR', 100);
+    const product = new Product('CHAIR', [batch]);
 
     try {
       await withTransaction(uow, async (uow) => {
-        await uow.batches.save(batch);
+        await uow.products.save(product);
         throw new Error('custom error');
       });
     } catch {
