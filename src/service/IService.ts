@@ -14,10 +14,4 @@ export interface IService {
     quantity: number,
     eta?: Date,
   ) => Promise<void>;
-  reAllocate: (
-    uow: IUnitOfWork,
-    orderId: string,
-    sku: string,
-    quantity: number,
-  ) => Promise<void>;
 }

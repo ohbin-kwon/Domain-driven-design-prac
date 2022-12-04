@@ -1,12 +1,9 @@
-import { allocate, Batch, OrderLine } from '../domain/batch';
+import { Batch, OrderLine, Product } from '../domain/product';
 import { IService } from './IService';
 import { withTransaction } from './transaction';
 import { IUnitOfWork } from './uow/IUow';
 
 export function service(): IService {
-  function isValidSku(sku: string, batches: Batch[]) {
-    return batches.find((batch) => batch.sku === sku);
-  }
   return {
     async allocate(
       uow: IUnitOfWork,
@@ -14,15 +11,14 @@ export function service(): IService {
       sku: string,
       quantity: number,
     ) {
+      const line = new OrderLine(orderId, sku, quantity);
+
       const batchId = await withTransaction<string>(uow, async (uow) => {
-        const batchList = await uow.batches.list();
+        const product = await uow.products.get({ sku: line.sku });
 
-        const validSku = isValidSku(sku, batchList);
-        if (validSku === undefined) throw new Error('invalid sku - ' + sku);
+        if (product === null) throw new Error('invalid sku - ' + sku);
 
-        const line = new OrderLine(orderId, sku, quantity);
-
-        const batchId = allocate(line, batchList);
+        const batchId = product.allocate(line);
         uow.commit();
         return batchId;
       });
@@ -37,22 +33,12 @@ export function service(): IService {
       eta?: Date,
     ) {
       await withTransaction(uow, async (uow) => {
-        await uow.batches.save(new Batch(id, sku, quantity, eta));
-        uow.commit();
-      });
-    },
-    async reAllocate(
-      uow: IUnitOfWork,
-      orderId: string,
-      sku: string,
-      quantity: number,
-    ) {
-      const line = new OrderLine(orderId, sku, quantity);
-      await withTransaction(uow, async (uow) => {
-        const batch = await uow.batches.get({ sku });
-        if (batch === null) throw new Error('invalid sku - ' + sku);
-        batch.deallocate(line);
-        allocate(line, [batch]);
+        let product = await uow.products.get({ sku });
+        if (product === null) {
+          product = new Product(sku, []);
+          uow.products.save(product);
+        }
+        product.batches.push(new Batch(id, sku, quantity, eta));
         uow.commit();
       });
     },
