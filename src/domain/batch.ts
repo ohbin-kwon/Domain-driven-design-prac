@@ -96,27 +96,14 @@ export class Batch {
   }
 }
 
-export function allocate(line: OrderLine, batches: Array<Batch>) {
-  const allocatableBatch = batches.filter(
-    (batch) => batch.canAllocate(line) === AllocateResult['SUCCESS'],
-  );
-  if (allocatableBatch.length === 0)
-    return (
-      AllocateResult['OUT-OF-STOCK'] + ' or ' + AllocateResult['DIFFERENT-SKU']
-    );
-  const targetBatch = _checkBatchesEta(allocatableBatch);
-  targetBatch.allocate(line);
-  return targetBatch.id;
-}
-
-class product {
+export class Product {
   constructor(public sku: string, public batches : Batch[]){
     this.sku = sku
     this.batches = batches
   }
 
-  allocate(line: OrderLine, batches: Array<Batch>) {
-    const allocatableBatch = batches.filter(
+  allocate(line: OrderLine) {
+    const allocatableBatch = this.batches.filter(
       (batch) => batch.canAllocate(line) === AllocateResult['SUCCESS'],
     );
     if (allocatableBatch.length === 0)
