@@ -51,12 +51,12 @@ export class OrderLine {
 
 export class Batch {
   constructor(
-    public id: string,
+    public batchId: string,
     public sku: string,
     public quantity: number,
     public eta?: Date,
   ) {
-    this.id = id;
+    this.batchId = batchId;
     this.sku = sku;
     this.eta = eta;
     this._purchasedQuantity = quantity;
@@ -97,10 +97,14 @@ export class Batch {
 }
 
 export class Product {
-  constructor(public sku: string, public batches : Batch[], public versionNumber: number = 0){
-    this.sku = sku
-    this.batches = batches
-    this.versionNumber = versionNumber
+  constructor(
+    public sku: string,
+    public batches: Batch[],
+    public versionNumber: number = 0,
+  ) {
+    this.sku = sku;
+    this.batches = batches;
+    this.versionNumber = versionNumber;
   }
 
   allocate(line: OrderLine) {
@@ -109,11 +113,13 @@ export class Product {
     );
     if (allocatableBatch.length === 0)
       return (
-        AllocateResult['OUT-OF-STOCK'] + ' or ' + AllocateResult['DIFFERENT-SKU']
+        AllocateResult['OUT-OF-STOCK'] +
+        ' or ' +
+        AllocateResult['DIFFERENT-SKU']
       );
     const targetBatch = _checkBatchesEta(allocatableBatch);
     targetBatch.allocate(line);
-    this.versionNumber += 1
-    return targetBatch.id;
+    this.versionNumber += 1;
+    return targetBatch.batchId;
   }
 }
