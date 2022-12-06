@@ -15,11 +15,10 @@ export function service(): IService {
 
       const batchId = await withTransaction<string>(uow, async (uow) => {
         const product = await uow.products.get({ sku: line.sku });
-
         if (product === null) throw new Error('invalid sku - ' + sku);
 
         const batchId = product.allocate(line);
-        uow.commit();
+        await uow.commit();
         return batchId;
       });
 
@@ -34,12 +33,12 @@ export function service(): IService {
     ) {
       await withTransaction(uow, async (uow) => {
         let product = await uow.products.get({ sku });
-        if (product === null) {
-          product = new Product(sku, []);
-          uow.products.save(product);
-        }
+
+        if (product === null) product = new Product(sku, []);
+
         product.batches.push(new Batch(id, sku, quantity, eta));
-        uow.commit();
+        await uow.products.save(product);
+        await uow.commit();
       });
     },
   };
