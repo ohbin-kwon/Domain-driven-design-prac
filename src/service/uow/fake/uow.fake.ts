@@ -9,11 +9,11 @@ export function FakeUow(
   return {
     committed: false,
     products: repo,
-    enter() {},
-    commit() {
+    async enter() {},
+    async commit() {
       this.committed = true;
     },
-    rollback() {},
+    async rollback() {},
     exit() {},
   };
 }

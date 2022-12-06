@@ -9,12 +9,14 @@ export async function MikroOrmUow(
   const session = await sessionFunc(config.NODE_ENV);
   const repo = MikroOrmRepository(session);
   return {
-    batches: repo,
-    enter() {},
-    commit() {
-      session.flush();
+    products: repo,
+    async enter() {},
+    async commit() {
+      await session.flush();
     },
-    rollback() {},
-    exit() {},
+    async rollback() {},
+    exit() {
+      session.clear();
+    },
   };
 }

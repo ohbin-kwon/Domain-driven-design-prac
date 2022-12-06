@@ -14,7 +14,7 @@ describe('fake uow test', () => {
     const product = new Product('CHAIR', [batch]);
     await withTransaction(uow, async (uow) => {
       await uow.products.save(product);
-      uow.commit();
+      await uow.commit();
     });
 
     expect(uow.committed).toStrictEqual(true);
