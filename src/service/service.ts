@@ -18,7 +18,9 @@ export function service(): IService {
         if (product === null) throw new Error('invalid sku - ' + sku);
 
         const batchId = product.allocate(line);
+        await uow.products.save(product)
         await uow.commit();
+        
         return batchId;
       });
 

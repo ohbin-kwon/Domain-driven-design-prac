@@ -102,7 +102,8 @@ export class Product {
     public batches: Batch[],
     public versionNumber: number = 0,
   ) {
-    if(batches.length === 0) throw Error('to initialize, product need at least one batch')
+    if (batches.length === 0)
+      throw Error('to initialize, product need at least one batch');
     this.sku = sku;
     this.batches = batches;
     this.versionNumber = versionNumber;
@@ -120,6 +121,7 @@ export class Product {
       );
     const targetBatch = _checkBatchesEta(allocatableBatch);
     targetBatch.allocate(line);
+
     this.versionNumber += 1;
     return targetBatch.batchId;
   }
