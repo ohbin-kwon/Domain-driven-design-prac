@@ -5,15 +5,16 @@ import {
   OneToMany,
   Collection,
   ManyToOne,
+  wrap,
 } from '@mikro-orm/core';
-import { Batch, OrderLine } from '../../domain/product';
+import { Batch } from '../../domain/product';
 import { OrderLineEntity } from './OrderLineEntity';
 import { ProductEntity } from './ProductEntity';
 
 @Entity()
 export class BatchEntity {
   @PrimaryKey({ type: 'text' })
-  id!: string;
+  batchId!: string;
 
   @Property({ type: 'text' })
   sku: string;
@@ -31,49 +32,98 @@ export class BatchEntity {
   eta?: Date;
 
   constructor(
-    id: string,
+    batchId: string,
     sku: string,
     quantity: number,
     product: ProductEntity,
     eta?: Date,
   ) {
-    this.id = id;
+    this.batchId = batchId;
     this.sku = sku;
     this.quantity = quantity;
     this.product = product;
     this.eta = eta;
   }
 
-  static async fromDomain(batch: Batch, product: ProductEntity) {
-    const newBatch = new BatchEntity(
-      batch.id,
+  static async _getBatchById(
+    batchId: string,
+    productEntity: ProductEntity,
+  ): Promise<BatchEntity | undefined> {
+    // MicroOrm collection do not have get Method. it only have matching method
+    // batchId is the identifier, so records length always 0 or 1
+    const batchEntity = (await productEntity.batches.matching({
+      where: { batchId },
+    }))[0]
+    return batchEntity;
+  }
+  // orderLine is always made as new orderLine
+  // because orderLine is value object
+  private static _ordersFromDomain(batch: Batch, batchEntity: BatchEntity) {
+    const orderEntities = [...batch._allocation].map(
+      (line) =>
+        new OrderLineEntity(line.orderId, line.sku, line.quantity, batchEntity),
+    );
+
+    return orderEntities;
+  }
+
+  private static _generateNewBatch(batch: Batch, productEntity: ProductEntity) {
+    const newBatchEntity = new BatchEntity(
+      batch.batchId,
       batch.sku,
       batch.quantity,
-      product,
+      productEntity,
       batch.eta,
     );
 
-    const allocations = [...batch._allocation].map(
-      (line) =>
-        new OrderLineEntity(line.orderId, line.sku, line.quantity, newBatch),
-    );
+    const orderEntities = this._ordersFromDomain(batch, newBatchEntity);
 
-    for (const entity of allocations) {
-      newBatch.allocations.add(entity);
-    }
-    return newBatch;
+    wrap(newBatchEntity).assign({
+      allocations: orderEntities,
+    });
+
+    return newBatchEntity;
   }
 
-  async toDomain(): Promise<Batch> {
-    const record = new Batch(this.id, this.sku, this.quantity, this.eta);
+  private static _updateBatch(
+    batch: Batch,
+    batchEntity: BatchEntity,
+    productEntity: ProductEntity,
+  ) {
+    const orderEntities = this._ordersFromDomain(batch, batchEntity);
 
-    if (this.allocations.isInitialized() === false) return record;
+    wrap(batchEntity).assign({
+      sku: batch.sku,
+      quantity: batch.quantity,
+      product: productEntity,
+      eta: batch.eta,
+      allocations: orderEntities,
+    });
 
-    record._allocation = new Set(
-      this.allocations
-        .getItems()
-        .map((o) => new OrderLine(o.orderId, o.sku, o.quantity)),
+    return batchEntity;
+  }
+
+  static async fromDomain(batch: Batch, product: ProductEntity): Promise<BatchEntity> {
+    // in _getBatchById method have Collection.matching method
+    // matching method cannot use Collection do not have any items, so use count method first
+    if (product.batches.count() === 0)
+      return this._generateNewBatch(batch, product);
+
+    const batchEntity = await this._getBatchById(batch.batchId, product);
+    // if batch record is not in collection, need to generate new BatchEntity
+    if (batchEntity === undefined)
+      return this._generateNewBatch(batch, product);
+
+    return this._updateBatch(batch, batchEntity, product);
+  }
+
+  toDomain(): Batch {
+    const batch = new Batch(this.batchId, this.sku, this.quantity, this.eta ?? undefined);
+    if (this.allocations.isInitialized() === false) return batch;
+
+    batch._allocation = new Set(
+      this.allocations.getItems().map((order) => order.toDomain()),
     );
-    return record;
+    return batch;
   }
 }

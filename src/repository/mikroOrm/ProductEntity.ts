@@ -4,13 +4,17 @@ import {
   Property,
   OneToMany,
   Collection,
+  wrap,
 } from '@mikro-orm/core';
-import { Batch, Product } from '../../domain/product';
+import { Product } from '../../domain/product';
 import { BatchEntity } from './BatchEntity';
 
 @Entity()
 export class ProductEntity {
-  @PrimaryKey({ type: 'text' })
+  @PrimaryKey({ type: 'int', autoincrement: true })
+  productId!: string;
+
+  @Property({ type: 'text' })
   sku: string;
 
   @Property({ type: 'int' })
@@ -24,34 +28,74 @@ export class ProductEntity {
     this.versionNumber = versionNumber;
   }
 
-  static async fromDomain(product: Product) {
-    const newProduct = new ProductEntity(product.sku, product.versionNumber);
-
-    const batches = [...product.batches].map(
-      (batch) =>
-        new BatchEntity(
-          batch.id,
-          batch.sku,
-          batch.quantity,
-          newProduct,
-          batch.eta,
-        ),
+  private static async _batchesFromDomain(
+    product: Product,
+    productEntity: ProductEntity,
+  ) {
+    const batchEntities = await Promise.all(
+      [...product.batches].map((batch) =>
+        BatchEntity.fromDomain(batch, productEntity),
+      ),
     );
-
-    for (const entity of batches) {
-      newProduct.batches.add(entity);
-    }
-    return newProduct;
+    return batchEntities;
   }
 
+  private static async _generateNewProduct(product: Product) {
+    const newProductEntity = new ProductEntity(
+      product.sku,
+      product.versionNumber,
+    );
+    const batchEntities = await this._batchesFromDomain(
+      product,
+      newProductEntity,
+    );
+
+    wrap(newProductEntity).assign(
+      {
+        batches: batchEntities,
+      },
+      { updateNestedEntities: true },
+    );
+
+    return newProductEntity;
+  }
+
+  private static async _updateProduct(
+    product: Product,
+    productEntity: ProductEntity,
+  ) {
+    const batchEntities = await this._batchesFromDomain(product, productEntity);
+
+    wrap(productEntity).assign(
+      {
+        sku: product.sku,
+        versionNumber: product.versionNumber,
+        batches: batchEntities,
+      },
+      { updateNestedEntities: true },
+    );
+
+    return productEntity;
+  }
+
+  static async fromDomain(
+    product: Product,
+    productEntity: ProductEntity | null,
+  ): Promise<ProductEntity> {
+    if (productEntity === null) {
+      return this._generateNewProduct(product);
+    }
+
+    return this._updateProduct(product, productEntity);
+  }
+
+  toDomain(): Product {
   async toDomain(): Promise<Product> {
     const batches = this.batches
       .getItems()
-      .map(
-        (batch) => new Batch(batch.id, batch.sku, batch.quantity, batch.eta),
-      );
-    const record = new Product(this.sku, batches, this.versionNumber);
+      .map((batchEntity) => batchEntity.toDomain());
+    const product = new Product(this.sku, batches, this.versionNumber);
 
-    return record;
+    return product;
   }
 }
