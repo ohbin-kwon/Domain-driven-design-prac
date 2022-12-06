@@ -1,4 +1,4 @@
-import { Batch } from '../../domain/product';
+import { Batch, Product } from '../../domain/product';
 import { withTransaction } from '../transaction';
 import { IUnitOfWork } from './IUow';
 
@@ -17,35 +17,40 @@ export function createUowTest(
     it('test commit', async () => {
       const uow = await setUpUow();
       const batch = new Batch('b1', 'CHAIR', 100);
+      const product = new Product('CHAIR', [batch])
+
       await withTransaction(uow, async (uow) => {
-        await uow.batches.save(batch);
-        uow.commit();
+        await uow.products.save(product);
+        await uow.commit();
       });
 
-      const list = await uow.batches.list();
-      expect(list).toStrictEqual([batch]);
+      const list = await uow.products.list();
+      expect(list).toStrictEqual([product]);
     });
     it('test rollback uncommitted work', async () => {
       const uow = await setUpUow();
       const batch = new Batch('b1', 'CHAIR', 100);
+      const product = new Product('CHAIR', [batch])
+
       await withTransaction(uow, async (uow) => {
-        await uow.batches.save(batch);
+        await uow.products.save(product);
       });
 
-      const list = await uow.batches.list();
+      const list = await uow.products.list();
       expect(list).toStrictEqual([]);
     });
     it('test rollback on error', async () => {
       const uow = await setUpUow();
       const batch = new Batch('b1', 'CHAIR', 100);
+      const product = new Product('CHAIR', [batch])
 
       try {
         await withTransaction(uow, async (uow) => {
-          await uow.batches.save(batch);
+          await uow.products.save(product);
           throw new Error('custom error');
         });
       } catch {
-        const list = await uow.batches.list();
+        const list = await uow.products.list();
         expect(list).toStrictEqual([]);
       }
     });
