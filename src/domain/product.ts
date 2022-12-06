@@ -102,6 +102,7 @@ export class Product {
     public batches: Batch[],
     public versionNumber: number = 0,
   ) {
+    if(batches.length === 0) throw Error('to initialize, product need at least one batch')
     this.sku = sku;
     this.batches = batches;
     this.versionNumber = versionNumber;

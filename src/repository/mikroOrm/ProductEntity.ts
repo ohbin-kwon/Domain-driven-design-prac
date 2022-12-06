@@ -90,7 +90,10 @@ export class ProductEntity {
   }
 
   toDomain(): Product {
-  async toDomain(): Promise<Product> {
+    if (this.batches.isInitialized() === false)
+      throw new Error(
+        'this error cannot occur, product always have batches. if occur this error need to check product domain constructor, or convert fromDomain to entity model, or database error',
+      );
     const batches = this.batches
       .getItems()
       .map((batchEntity) => batchEntity.toDomain());

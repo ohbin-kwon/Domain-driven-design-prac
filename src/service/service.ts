@@ -32,11 +32,13 @@ export function service(): IService {
       eta?: Date,
     ) {
       await withTransaction(uow, async (uow) => {
+        const batch = new Batch(id, sku, quantity, eta);
         let product = await uow.products.get({ sku });
 
-        if (product === null) product = new Product(sku, []);
+        product === null
+          ? (product = new Product(sku, [batch]))
+          : product.batches.push(batch);
 
-        product.batches.push(new Batch(id, sku, quantity, eta));
         await uow.products.save(product);
         await uow.commit();
       });

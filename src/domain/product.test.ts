@@ -129,7 +129,7 @@ describe('product test', () => {
     const line = new OrderLine('1', 'CLOCK', 10);
     const product = new Product('CLOCK', [inStockBatch, shipmentBatch]);
 
-    expect(product.allocate(line)).toBe(inStockBatch.id);
+    expect(product.allocate(line)).toBe(inStockBatch.batchId);
   });
 });
 
