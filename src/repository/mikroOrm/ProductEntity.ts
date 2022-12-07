@@ -17,13 +17,15 @@ export class ProductEntity {
   @Property({ type: 'text' })
   sku: string;
 
-
+  @Property({ version: true })
+  versionNumber: number;
 
   @OneToMany('BatchEntity', 'product')
   batches = new Collection<BatchEntity>(this);
 
-  constructor(sku: string) {
+  constructor(sku: string, versionNumber: number) {
     this.sku = sku;
+    this.versionNumber = versionNumber;
   }
 
   private static async _batchesFromDomain(
@@ -41,6 +43,7 @@ export class ProductEntity {
   private static async _generateNewProduct(product: Product) {
     const newProductEntity = new ProductEntity(
       product.sku,
+      product.versionNumber,
     );
     const batchEntities = await this._batchesFromDomain(
       product,
@@ -66,6 +69,7 @@ export class ProductEntity {
     wrap(productEntity).assign(
       {
         sku: product.sku,
+        versionNumber: product.versionNumber,
         batches: batchEntities,
       },
       { updateNestedEntities: true },
@@ -93,7 +97,7 @@ export class ProductEntity {
     const batches = this.batches
       .getItems()
       .map((batchEntity) => batchEntity.toDomain());
-    const product = new Product(this.sku, batches);
+    const product = new Product(this.sku, batches, this.versionNumber);
 
     return product;
   }
