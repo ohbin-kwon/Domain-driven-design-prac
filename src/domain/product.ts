@@ -122,7 +122,6 @@ export class Product {
     const targetBatch = _checkBatchesEta(allocatableBatch);
     targetBatch.allocate(line);
 
-    this.versionNumber += 1;
     return targetBatch.batchId;
   }
 }
