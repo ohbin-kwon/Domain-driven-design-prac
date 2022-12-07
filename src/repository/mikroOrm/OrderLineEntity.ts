@@ -4,7 +4,7 @@ import type { BatchEntity } from './BatchEntity';
 
 @Entity()
 export class OrderLineEntity {
-  @PrimaryKey({ type: 'text'})
+  @PrimaryKey({ type: 'text' })
   orderId: string;
 
   @Property({ type: 'text' })
@@ -26,6 +26,41 @@ export class OrderLineEntity {
     this.sku = sku;
     this.quantity = quantity;
     this.batch = batch;
+  }
+
+  private static async _getBatchById(
+    orderId: string,
+    batchEntity: BatchEntity,
+  ): Promise<OrderLineEntity | undefined> {
+    const lineEntity = (
+      await batchEntity.allocations.matching({
+        where: { orderId },
+      })
+    )[0];
+    return lineEntity;
+  }
+
+  private static _generateNewLine(line: OrderLine, batchEntity: BatchEntity) {
+    const newLineEntity = new OrderLineEntity(
+      line.orderId,
+      line.sku,
+      line.quantity,
+      batchEntity,
+    );
+
+    return newLineEntity;
+  }
+
+  static async fromDomain(line: OrderLine, batchEntity: BatchEntity) {
+    if (batchEntity.allocations.count() === 0)
+      return this._generateNewLine(line, batchEntity);
+
+    const lineEntity = await this._getBatchById(line.orderId, batchEntity);
+
+    if (lineEntity === undefined)
+      return this._generateNewLine(line, batchEntity);
+
+    return lineEntity;
   }
 
   toDomain(): OrderLine {

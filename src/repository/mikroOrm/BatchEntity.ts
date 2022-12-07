@@ -51,23 +51,32 @@ export class BatchEntity {
   ): Promise<BatchEntity | undefined> {
     // MicroOrm collection do not have get Method. it only have matching method
     // batchId is the identifier, so records length always 0 or 1
-    const batchEntity = (await productEntity.batches.matching({
-      where: { batchId },
-    }))[0]
+    const batchEntity = (
+      await productEntity.batches.matching({
+        where: { batchId },
+      })
+    )[0];
     return batchEntity;
   }
   // orderLine is always made as new orderLine
   // because orderLine is value object
-  private static _ordersFromDomain(batch: Batch, batchEntity: BatchEntity) {
-    const orderEntities = [...batch._allocation].map(
-      (line) =>
-        new OrderLineEntity(line.orderId, line.sku, line.quantity, batchEntity),
+  private static async _ordersFromDomain(
+    batch: Batch,
+    batchEntity: BatchEntity,
+  ) {
+    const orderEntities = await Promise.all(
+      [...batch._allocation].map((line) =>
+        OrderLineEntity.fromDomain(line, batchEntity),
+      ),
     );
 
     return orderEntities;
   }
 
-  private static _generateNewBatch(batch: Batch, productEntity: ProductEntity) {
+  private static async _generateNewBatch(
+    batch: Batch,
+    productEntity: ProductEntity,
+  ) {
     const newBatchEntity = new BatchEntity(
       batch.batchId,
       batch.sku,
@@ -76,7 +85,7 @@ export class BatchEntity {
       batch.eta,
     );
 
-    const orderEntities = this._ordersFromDomain(batch, newBatchEntity);
+    const orderEntities = await this._ordersFromDomain(batch, newBatchEntity);
 
     wrap(newBatchEntity).assign({
       allocations: orderEntities,
@@ -85,12 +94,12 @@ export class BatchEntity {
     return newBatchEntity;
   }
 
-  private static _updateBatch(
+  private static async _updateBatch(
     batch: Batch,
     batchEntity: BatchEntity,
     productEntity: ProductEntity,
   ) {
-    const orderEntities = this._ordersFromDomain(batch, batchEntity);
+    const orderEntities = await this._ordersFromDomain(batch, batchEntity);
 
     wrap(batchEntity).assign({
       sku: batch.sku,
@@ -103,22 +112,30 @@ export class BatchEntity {
     return batchEntity;
   }
 
-  static async fromDomain(batch: Batch, product: ProductEntity): Promise<BatchEntity> {
+  static async fromDomain(
+    batch: Batch,
+    productEntity: ProductEntity,
+  ): Promise<BatchEntity> {
     // in _getBatchById method have Collection.matching method
     // matching method cannot use Collection do not have any items, so use count method first
-    if (product.batches.count() === 0)
-      return this._generateNewBatch(batch, product);
+    if (productEntity.batches.count() === 0)
+      return this._generateNewBatch(batch, productEntity);
 
-    const batchEntity = await this._getBatchById(batch.batchId, product);
+    const batchEntity = await this._getBatchById(batch.batchId, productEntity);
     // if batch record is not in collection, need to generate new BatchEntity
     if (batchEntity === undefined)
-      return this._generateNewBatch(batch, product);
+      return this._generateNewBatch(batch, productEntity);
 
-    return this._updateBatch(batch, batchEntity, product);
+    return this._updateBatch(batch, batchEntity, productEntity);
   }
 
   toDomain(): Batch {
-    const batch = new Batch(this.batchId, this.sku, this.quantity, this.eta ?? undefined);
+    const batch = new Batch(
+      this.batchId,
+      this.sku,
+      this.quantity,
+      this.eta ?? undefined,
+    );
     if (this.allocations.isInitialized() === false) return batch;
 
     batch._allocation = new Set(
