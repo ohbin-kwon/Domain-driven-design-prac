@@ -17,7 +17,7 @@ export class ProductEntity {
   @Property({ type: 'text' })
   sku: string;
 
-  @Property({ version: true })
+  @Property()
   versionNumber: number;
 
   @OneToMany('BatchEntity', 'product')
