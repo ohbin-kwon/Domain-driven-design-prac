@@ -1,3 +1,4 @@
+import { Exception } from '../util/exception';
 import { Batch, OrderLine, Product } from './product';
 // batchQuantity, lineQuantity에 맞는 batch와 line을 만들어내는 함수
 function makeBatchAndLine(
@@ -14,18 +15,20 @@ describe('allocate test', () => {
   // required보다 available이 많은 경우 할당할 수 있다.
   test('test can allocate if available greater than required', () => {
     const [largeBatch, smallLine] = makeBatchAndLine('LAMP', 20, 2);
-    expect(largeBatch.canAllocate(smallLine)).toBe('success');
+    expect(largeBatch.canAllocate(smallLine)).toBe(AllocateResult['SUCCESS']);
   });
   // required보다 available이 적은 경우 할당할 수 없다.
   test('test cannot allocate if available smaller than required', () => {
     const [smallBatch, largeLine] = makeBatchAndLine('LAMP', 2, 20);
-    expect(smallBatch.canAllocate(largeLine)).toBe('out of stock');
+    expect(smallBatch.canAllocate(largeLine)).toBe(
+      AllocateResult['OUT-OF-STOCK'],
+    );
   });
 
   // required와 available이 같다면 할당 할 수 있다.
   test('test can allocate if available equal to required', () => {
     const [batch, line] = makeBatchAndLine('LAMP', 2, 2);
-    expect(batch.canAllocate(line)).toBe('success');
+    expect(batch.canAllocate(line)).toBe(AllocateResult['SUCCESS']);
   });
 
   // batch와 line의 sku가 다르다면 할당 할 수 없다.
@@ -33,7 +36,9 @@ describe('allocate test', () => {
     const batch = new Batch('batch-001', 'LAMP', 100, new Date('2022-08-25'));
     const differentSkuLine = new OrderLine('1', 'CHAIR', 10);
     Object.freeze(differentSkuLine);
-    expect(batch.canAllocate(differentSkuLine)).toBe('sku is different');
+    expect(batch.canAllocate(differentSkuLine)).toBe(
+      AllocateResult['DIFFERENT-SKU'],
+    );
   });
 
   test('test allocating to a batch reduces the available quantity', () => {
@@ -143,8 +148,12 @@ describe('cannot allocate when batches are out of stock or sku is different', ()
     const secondLine = new OrderLine('1', 'LAMP', 1);
     Object.freeze(secondLine);
 
-    expect(product.allocate(secondLine)).toBe(
-      'out of stock or sku is different',
+    expect(() => product.allocate(secondLine)).toThrow(
+      new Exception(
+        AllocateResult['OUT-OF-STOCK'] +
+          ' or ' +
+          AllocateResult['DIFFERENT-SKU'],
+      ),
     );
   });
 
@@ -157,8 +166,12 @@ describe('cannot allocate when batches are out of stock or sku is different', ()
     const differentSkuLine = new OrderLine('1', 'CHAIR', 10);
     Object.freeze(differentSkuLine);
 
-    expect(product.allocate(differentSkuLine)).toBe(
-      'out of stock or sku is different',
+    expect(() => product.allocate(differentSkuLine)).toThrow(
+      new Exception(
+        AllocateResult['OUT-OF-STOCK'] +
+          ' or ' +
+          AllocateResult['DIFFERENT-SKU'],
+      ),
     );
   });
 });

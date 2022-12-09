@@ -94,7 +94,7 @@ export function createUowTest(
       await withTransaction(uow, async (uow) => {
         const product = await uow.products.get({ sku: 'TABLE' });
 
-        if (product === null) return new Error('');
+        if (product === null) return new Error('test: product must be existed');
         product.allocate(LINE);
         await uow.products.save(product);
         await uow.commit();
@@ -133,11 +133,11 @@ export function createUowTest(
       const uow2 = await setUpUow(setupSession);
       const uow3 = await setUpUow(setupSession);
       await Promise.all([
-        tryAllocate(uow2, 'o1', 'TABLE').catch(e => {
-          errors.push(e);
+        tryAllocate(uow2, 'o1', 'TABLE').catch(error => {
+          errors.push(error);
         }),
-        tryAllocate(uow3, 'o2', 'TABLE').catch(e => {
-          errors.push(e)
+        tryAllocate(uow3, 'o2', 'TABLE').catch(error => {
+          errors.push(error)
         }),
       ]);
 

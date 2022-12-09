@@ -7,8 +7,8 @@ const uuid = () => {
   return tokens[2] + tokens[1] + tokens[0] + tokens[3] + tokens[4];
 };
 
-const addBatch = async (id: string, sku: string, qty: number, eta?: Date) => {
-  await request(app).post('/batch').send({ id, sku, qty, eta }).expect(201);
+const addBatch = async (batchId: string, sku: string, quantity: number, eta?: Date) => {
+  await request(app).post('/batch').send({ batchId, sku, quantity, eta }).expect(201);
 };
 
 describe('e2e senario: production orm is mikroOrm', () => {
@@ -24,7 +24,7 @@ describe('e2e senario: production orm is mikroOrm', () => {
     await addBatch(laterBatchId, sku, 100, new Date('2022-08-13'));
     await addBatch(otherBatchId, otherSku, 100);
 
-    const data = { orderId, sku, qty: 3 };
+    const data = { orderId, sku, quantity: 3 };
     await request(app)
       .post('/allocate')
       .send(data)
