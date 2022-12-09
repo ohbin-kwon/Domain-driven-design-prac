@@ -5,12 +5,12 @@ export async function withTransaction<T>(
   job: (uow: IUnitOfWork) => Promise<T>,
 ) {
   try {
-    uow.enter();
+    await uow.enter();
     return await job(uow);
   } catch (e) {
-    uow.rollback();
+    await uow.rollback();
     throw e;
   } finally {
-    uow.exit();
+    await uow.exit();
   }
 }
