@@ -1,4 +1,4 @@
-import { MikroORM } from '@mikro-orm/core';
+import { LockMode, MikroORM } from '@mikro-orm/core';
 import { PostgreSqlDriver } from '@mikro-orm/postgresql';
 import { Product } from '../../domain/product';
 import { ProductSpecificProps, Filter, IRepository } from '../IRepository';
@@ -16,13 +16,25 @@ export function MikroOrmRepository(
       const product = productEntity?.toDomain();
       return product ?? null;
     },
-    async save(product: Product) {
-      let loaded = await productRepo.findOne(
-        { sku: product.sku },
-        {
-          populate: true,
-        },
-      );
+    async save(product: Product, transaction?: boolean) {
+      let loaded : ProductEntity | null;
+      if(transaction === false) {
+        loaded = await productRepo.findOne(
+          { sku: product.sku },
+          {
+            populate: true,
+          },
+        );
+      }else{
+        loaded = await productRepo.findOne(
+          { sku: product.sku },
+          {
+            populate: true,
+            lockMode: LockMode.PESSIMISTIC_WRITE
+          },
+        );
+      }
+
 
       const productEntity = await ProductEntity.fromDomain(product, loaded);
       productRepo.persist(productEntity);

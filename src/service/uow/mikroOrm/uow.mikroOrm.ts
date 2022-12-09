@@ -12,7 +12,7 @@ export async function MikroOrmUow(
   return {
     products: repo,
     async enter() {
-      await session.begin({isolationLevel: IsolationLevel.REPEATABLE_READ});
+      await session.begin();
     },
     async commit() {
       if (_closed === false){

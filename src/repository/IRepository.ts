@@ -7,6 +7,6 @@ export interface IRepository {
   get: <T extends ProductSpecificProps>(
     filter: Filter<T>,
   ) => Promise<Product | null>;
-  save: (product: Product) => Promise<void>;
+  save: (product: Product, transaction?: boolean) => Promise<void>;
   list: () => Promise<Product[]>;
 }

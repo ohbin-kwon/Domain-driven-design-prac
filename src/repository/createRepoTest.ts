@@ -50,7 +50,7 @@ export function createRepoTest(
       );
       const NEW_PRODUCT = new Product('CHAIR', [NEW_BATCH]);
 
-      await repo.save(NEW_PRODUCT);
+      await repo.save(NEW_PRODUCT, false);
       await session.flush();
 
       expect(await repo.get({ sku: 'CHAIR' })).toStrictEqual(NEW_PRODUCT);
@@ -76,8 +76,8 @@ export function createRepoTest(
       const NEW_PRODUCT = new Product('CHAIR', [NEW_BATCH]);
       const SECOND_PRODUCT = new Product('CHAIR', [SECOND_BATCH]);
 
-      await repo.save(NEW_PRODUCT);
-      await repo.save(SECOND_PRODUCT);
+      await repo.save(NEW_PRODUCT, false);
+      await repo.save(SECOND_PRODUCT, false);
       await session.flush();
 
       const batches = await repo.list();
@@ -101,7 +101,7 @@ export function createRepoTest(
 
       NEW_PRODUCT.allocate(NEW_LINE);
 
-      await repo.save(NEW_PRODUCT);
+      await repo.save(NEW_PRODUCT, false);
       await session.flush();
 
       expect(await repo.get({ sku: 'CHAIR' })).toStrictEqual(NEW_PRODUCT);
