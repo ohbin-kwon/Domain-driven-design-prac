@@ -1,41 +1,41 @@
 import express from 'express';
 import { service } from './service/service';
 import { MikroOrmUow } from './service/uow/mikroOrm/uow.mikroOrm';
-import { connectMikroOrm, setUpMikroOrmSession } from './repository/mikroOrm/config/setupOrm';
+import {
+  connectMikroOrm,
+  setUpMikroOrmSession,
+} from './repository/mikroOrm/config/setupOrm';
+import { errorHandler } from './util/errorHandler';
 
 const app = express();
 
 app.use(express.json());
 
-connectMikroOrm()
+connectMikroOrm();
 
-app.post('/batch', async (req, res) => {
-  const { id, sku, qty, eta } = req.body;
+app.post('/batch', async (req, res, next) => {
+  const { batchId, sku, quantity, eta } = req.body;
   try {
     const uow = await MikroOrmUow(setUpMikroOrmSession);
-    await service().addBatch(uow, id, sku, qty, eta);
+    await service().addBatch(uow, batchId, sku, quantity, eta);
     res.status(201).end();
   } catch (error) {
-    let message;
-    if (error instanceof Error) message = error.message;
-    else message = String(error);
-    res.status(400).send({ message });
+    next(error);
   }
 });
 
-app.post('/allocate', async (req, res) => {
-  const { orderId, sku, qty } = req.body;
+app.post('/allocate', async (req, res, next) => {
+  const { orderId, sku, quantity } = req.body;
 
   try {
     const uow = await MikroOrmUow(setUpMikroOrmSession);
-    const batchId = await service().allocate(uow, orderId, sku, qty);
+    const batchId = await service().allocate(uow, orderId, sku, quantity);
     res.status(201).send({ batchId });
   } catch (error) {
-    let message;
-    if (error instanceof Error) message = error.message;
-    else message = String(error);
-    res.status(400).send({ message });
+    next(error);
   }
 });
+
+app.use(errorHandler);
 
 export default app;
