@@ -13,7 +13,7 @@ export function service(): IService {
     ) {
       const line = new OrderLine(orderId, sku, quantity);
 
-      const batchId = await withTransaction<string>(uow, async (uow) => {
+      const batchId = await withTransaction(uow, async (uow) => {
         const product = await uow.products.get({ sku: line.sku });
         if (product === null) throw new Error('invalid sku - ' + sku);
 

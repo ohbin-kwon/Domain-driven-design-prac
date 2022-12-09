@@ -20,11 +20,6 @@ describe('e2e senario: production orm is mikroOrm', () => {
     const otherSku = uuid();
     const orderId = uuid();
 
-    // await Promise.all([
-    //   addBatch(earlyBatchId, sku, 100, new Date('2022-08-11')),
-    //   addBatch(laterBatchId, sku, 100, new Date('2022-08-13')),
-    //   addBatch(otherBatchId, otherSku, 100),
-    // ]);
     await addBatch(earlyBatchId, sku, 100, new Date('2022-08-11'));
     await addBatch(laterBatchId, sku, 100, new Date('2022-08-13'));
     await addBatch(otherBatchId, otherSku, 100);
