@@ -14,6 +14,6 @@ export function FakeUow(
       this.committed = true;
     },
     async rollback() {},
-    exit() {},
+    async exit() {},
   };
 }

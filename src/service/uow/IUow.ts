@@ -5,5 +5,5 @@ export interface IUnitOfWork {
   enter: () => Promise<void>;
   commit: () => Promise<void>;
   rollback: () => Promise<void>;
-  exit: () => void;
+  exit: () => Promise<void>;
 }
