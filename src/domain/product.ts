@@ -1,8 +1,5 @@
-enum AllocateResult {
-  'SUCCESS' = 'success',
-  'OUT-OF-STOCK' = 'out of stock',
-  'DIFFERENT-SKU' = 'sku is different',
-}
+import { Exception } from "../util/exception";
+
 interface ExistedEtaBatch extends Batch {
   eta: Date;
 }
@@ -103,7 +100,7 @@ export class Product {
     public versionNumber: number = 0,
   ) {
     if (batches.length === 0)
-      throw Error('to initialize, product need at least one batch');
+      throw new Exception('to initialize, product need at least one batch');
     this.sku = sku;
     this.batches = batches;
     this.versionNumber = versionNumber;
@@ -114,14 +111,15 @@ export class Product {
       (batch) => batch.canAllocate(line) === AllocateResult['SUCCESS'],
     );
     if (allocatableBatch.length === 0)
-      return (
+      throw new Exception(
         AllocateResult['OUT-OF-STOCK'] +
-        ' or ' +
-        AllocateResult['DIFFERENT-SKU']
+          ' or ' +
+          AllocateResult['DIFFERENT-SKU'],
+          400
       );
     const targetBatch = _checkBatchesEta(allocatableBatch);
     targetBatch.allocate(line);
-    this.versionNumber += 1
+    this.versionNumber += 1;
     return targetBatch.batchId;
   }
 }

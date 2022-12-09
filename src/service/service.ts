@@ -1,4 +1,5 @@
 import { Batch, OrderLine, Product } from '../domain/product';
+import { Exception } from '../util/exception';
 import { IService } from './IService';
 import { withTransaction } from './transaction';
 import { IUnitOfWork } from './uow/IUow';
@@ -15,12 +16,12 @@ export function service(): IService {
 
       const batchId = await withTransaction(uow, async (uow) => {
         const product = await uow.products.get({ sku: line.sku });
-        if (product === null) throw new Error('invalid sku - ' + sku);
+        if (product === null) throw new Exception('invalid sku - ' + sku, 400);
 
         const batchId = product.allocate(line);
-        await uow.products.save(product)
+        await uow.products.save(product);
         await uow.commit();
-        
+
         return batchId;
       });
 
@@ -28,13 +29,13 @@ export function service(): IService {
     },
     async addBatch(
       uow: IUnitOfWork,
-      id: string,
+      batchId: string,
       sku: string,
       quantity: number,
       eta?: Date,
     ) {
       await withTransaction(uow, async (uow) => {
-        const batch = new Batch(id, sku, quantity, eta);
+        const batch = new Batch(batchId, sku, quantity, eta);
         let product = await uow.products.get({ sku });
 
         product === null

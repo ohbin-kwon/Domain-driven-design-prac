@@ -1,6 +1,7 @@
 import path from 'path';
 import dotenv from 'dotenv';
 import { ENV_PATH } from './const';
+import { Exception } from './util/exception';
 dotenv.config({ path: path.resolve(__dirname, ENV_PATH) });
 
 interface ENV {
@@ -47,7 +48,7 @@ const getConfig = (): ENV => {
 const getSanitzedConfig = (config: ENV): Config => {
   for (const [key, value] of Object.entries(config)) {
     if (value === undefined) {
-      throw new Error(`Missing key ${key} in config.env`);
+      throw new Exception(`Missing key ${key} in config.env`);
     }
   }
   return config as Config;
