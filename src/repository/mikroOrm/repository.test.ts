@@ -1,4 +1,4 @@
 import { createRepoTest } from '../createRepoTest';
-import { setUpMikroOrmSession, tearDownMikroOrm } from './config/setupOrm';
+import { connectMikroOrm, setUpMikroOrmSession, tearDownMikroOrm } from './config/setupOrmTest';
 
-createRepoTest('MikroOrmTest', setUpMikroOrmSession, tearDownMikroOrm);
+createRepoTest('MikroOrmTest',connectMikroOrm, setUpMikroOrmSession, tearDownMikroOrm);

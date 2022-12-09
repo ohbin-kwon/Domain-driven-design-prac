@@ -1,22 +1,37 @@
 import { Batch, OrderLine, Product } from '../domain/product';
 import { IRepository } from './IRepository';
 import { MikroOrmRepository } from './mikroOrm/repository';
+import { ProductEntity } from './mikroOrm/ProductEntity';
+import { BatchEntity } from './mikroOrm/BatchEntity';
+import { OrderLineEntity } from './mikroOrm/OrderLineEntity';
 
 // this test factory is for repository implementation
 // fake repository test is independent
 export function createRepoTest(
   label: string,
-  setupSession: (env: NODE_ENV) => Promise<SESSION>,
-  teardown: (env: NODE_ENV) => Promise<void> = async () => undefined,
+  connect: () => Promise<void>,
+  setupSession: () => Promise<SESSION>,
+  teardown: () => Promise<void> = async () => undefined,
 ) {
   describe(label, () => {
+    beforeAll(async () => {
+      await connect();
+    })
+
+    afterAll(async () => {
+      await teardown();
+    });
+
     afterEach(async () => {
-      await teardown('test');
+      const session = await setupSession();
+      await session.createQueryBuilder(OrderLineEntity).delete().execute();
+      await session.createQueryBuilder(BatchEntity).delete().execute();
+      await session.createQueryBuilder(ProductEntity).delete().execute();
     });
 
     it('test expect null if database is empty ', async () => {
       let repo: IRepository;
-      const session = await setupSession('test');
+      const session = await setupSession();
       repo = MikroOrmRepository(session);
 
       expect(await repo.get({ sku: 'CHAIR' })).toStrictEqual(null);
@@ -24,7 +39,7 @@ export function createRepoTest(
 
     it('test expect the product if database has the product ', async () => {
       let repo: IRepository;
-      const session = await setupSession('test');
+      const session = await setupSession();
       repo = MikroOrmRepository(session);
 
       const NEW_BATCH = new Batch(
@@ -43,7 +58,7 @@ export function createRepoTest(
 
     it('test expect the product list if database has the products', async () => {
       let repo: IRepository;
-      const session = await setupSession('test');
+      const session = await setupSession();
       repo = MikroOrmRepository(session);
 
       const NEW_BATCH = new Batch(
@@ -72,7 +87,7 @@ export function createRepoTest(
 
     it('test expect the product can view order if batch allocated', async () => {
       let repo: IRepository;
-      const session = await setupSession('test');
+      const session = await setupSession();
       repo = MikroOrmRepository(session);
 
       const NEW_LINE = new OrderLine('order-1', 'CHAIR', 50);
